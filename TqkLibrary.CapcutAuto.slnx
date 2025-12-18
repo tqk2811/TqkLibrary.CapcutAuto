@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="ProjectBuildProperties.targets" />
+  </Folder>
   <Project Path="TqkLibrary.CapcutAuto.Animations.Ins/TqkLibrary.CapcutAuto.Animations.Ins.csproj" />
   <Project Path="TqkLibrary.CapcutAuto.Animations.Outs/TqkLibrary.CapcutAuto.Animations.Outs.csproj" />
   <Project Path="TqkLibrary.CapcutAuto.Transitions/TqkLibrary.CapcutAuto.Transitions.csproj" />
