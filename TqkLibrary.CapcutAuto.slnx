@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="TqkLibrary.CapcutAuto.Animations.Ins/TqkLibrary.CapcutAuto.Animations.Ins.csproj" />
+  <Project Path="TqkLibrary.CapcutAuto.Animations.Outs/TqkLibrary.CapcutAuto.Animations.Outs.csproj" />
+  <Project Path="TqkLibrary.CapcutAuto.Transitions/TqkLibrary.CapcutAuto.Transitions.csproj" />
+  <Project Path="TqkLibrary.CapcutAuto/TqkLibrary.CapcutAuto.csproj" />
+</Solution>
