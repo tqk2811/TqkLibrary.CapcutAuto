@@ -1,9 +1,23 @@
 <Solution>
+  <Configurations>
+    <BuildType Name="Debug" />
+    <BuildType Name="Release" />
+    <BuildType Name="RemoteDebug" />
+  </Configurations>
   <Folder Name="/Solution Items/">
     <File Path="ProjectBuildProperties.targets" />
   </Folder>
-  <Project Path="TqkLibrary.CapcutAuto.Animations.Ins/TqkLibrary.CapcutAuto.Animations.Ins.csproj" />
-  <Project Path="TqkLibrary.CapcutAuto.Animations.Outs/TqkLibrary.CapcutAuto.Animations.Outs.csproj" />
-  <Project Path="TqkLibrary.CapcutAuto.Transitions/TqkLibrary.CapcutAuto.Transitions.csproj" />
-  <Project Path="TqkLibrary.CapcutAuto/TqkLibrary.CapcutAuto.csproj" />
+  <Project Path="TqkLibrary.CapcutAuto.Animations.Ins/TqkLibrary.CapcutAuto.Animations.Ins.csproj">
+    <BuildType Solution="RemoteDebug|*" Project="Debug" />
+  </Project>
+  <Project Path="TqkLibrary.CapcutAuto.Animations.Outs/TqkLibrary.CapcutAuto.Animations.Outs.csproj">
+    <BuildType Solution="RemoteDebug|*" Project="Debug" />
+  </Project>
+  <Project Path="TqkLibrary.CapcutAuto.ResourceTracker/TqkLibrary.CapcutAuto.ResourceTracker.csproj" />
+  <Project Path="TqkLibrary.CapcutAuto.Transitions/TqkLibrary.CapcutAuto.Transitions.csproj">
+    <BuildType Solution="RemoteDebug|*" Project="Debug" />
+  </Project>
+  <Project Path="TqkLibrary.CapcutAuto/TqkLibrary.CapcutAuto.csproj">
+    <BuildType Solution="RemoteDebug|*" Project="Debug" />
+  </Project>
 </Solution>
