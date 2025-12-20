@@ -1,12 +1,13 @@
 <Project>
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0</TargetFrameworks>
+		<TargetFrameworks>net8.0</TargetFrameworks>
 		<LangVersion>14.0</LangVersion>
 		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
 		<PreserveCompilationContext>false</PreserveCompilationContext>
 		<GenerateDependencyFile>false</GenerateDependencyFile>
 		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
-		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<!--<GenerateDocumentationFile>True</GenerateDocumentationFile>-->
 		<PathMap>$(MSBuildProjectDirectory)=$(MSBuildProjectName)</PathMap>
 		<AssemblyVersion>1.0</AssemblyVersion>
 	</PropertyGroup>

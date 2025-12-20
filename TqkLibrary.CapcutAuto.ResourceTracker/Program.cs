@@ -4,6 +4,8 @@ using System.CommandLine;
 using System.Timers;
 using System.Transactions;
 
+string test = JsonConvert.SerializeObject(Guid.NewGuid());
+
 string CapcutDatasDir = Path.Combine(AppContext.BaseDirectory, "CapcutDatas");
 
 string AnimationsDir = Path.Combine(CapcutDatasDir, "Animations");
