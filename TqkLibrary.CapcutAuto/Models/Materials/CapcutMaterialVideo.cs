@@ -37,11 +37,11 @@ namespace TqkLibrary.CapcutAuto.Models.Materials
                 throw new FileNotFoundException(videoFilePath);
             IMediaAnalysis mediaAnalysis = await FFProbe.AnalyseAsync(videoFilePath, cancellationToken: cancellationToken);
             if (mediaAnalysis.PrimaryVideoStream is null)
-                throw new InvalidOperationException($"Video had no VideoStream");
+                throw new InvalidOperationException($"File had no VideoStream");
 
             return new CapcutMaterialVideo()
             {
-                Path = fileInfo.FullName,
+                Path = fileInfo.FullName.Replace('\\','/'),
                 Type = MaterialType.video,
                 MaterialName = fileInfo.Name,
                 Duration = mediaAnalysis.Duration,

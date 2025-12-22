@@ -1,9 +1,11 @@
 ﻿using Newtonsoft.Json;
+using System.Collections;
 using TqkLibrary.CapcutAuto.Enums;
+using TqkLibrary.CapcutAuto.Models.Resources;
 
 namespace TqkLibrary.CapcutAuto.Models.Materials
 {
-    public class CapcutMaterialAnimation : CapcutMaterial
+    public class CapcutMaterialAnimation : CapcutMaterial, IEnumerable
     {
         readonly List<CapcutAnimation> _animations = new();
 
@@ -19,6 +21,35 @@ namespace TqkLibrary.CapcutAuto.Models.Materials
             Type = MaterialType.sticker_animation;
         }
 
+        public CapcutAnimation? In
+        {
+            get { return _animations.FirstOrDefault(x => x.Type == AnimationType.@in); }
+            set
+            {
+                if (value is not null && value.Type != AnimationType.@in)
+                    throw new InvalidOperationException($"Animation type must be 'in'");
+                var @in = In;
+                if (@in is not null)
+                    _animations.Remove(@in);
+                if (value is not null)
+                    _animations.Add(value);
+            }
+        }
+        public CapcutAnimation? Out
+        {
+            get { return _animations.FirstOrDefault(x => x.Type == AnimationType.@out); }
+            set
+            {
+                if (value is not null && value.Type != AnimationType.@out)
+                    throw new InvalidOperationException($"Animation type must be 'out'");
+                var @out = Out;
+                if (@out is not null)
+                    _animations.Remove(@out);
+                if (value is not null)
+                    _animations.Add(value);
+            }
+        }
+
         public void Add(CapcutAnimation capcutAnimation)
         {
             if (capcutAnimation is null) throw new ArgumentNullException(nameof(capcutAnimation));
@@ -26,5 +57,7 @@ namespace TqkLibrary.CapcutAuto.Models.Materials
                 throw new InvalidOperationException($"Only two animation in and out");
             _animations.Add(capcutAnimation);
         }
+
+        public IEnumerator GetEnumerator() => _animations.GetEnumerator();
     }
 }

@@ -1,10 +1,11 @@
 ﻿using Newtonsoft.Json;
+using System.Collections;
 using TqkLibrary.CapcutAuto.Enums;
 using TqkLibrary.CapcutAuto.Models.Tracks.Segments;
 
 namespace TqkLibrary.CapcutAuto.Models.Tracks
 {
-    public class CapcutTrack : CapcutId
+    public abstract class CapcutTrack : CapcutId, IEnumerable
     {
         protected readonly List<CapcutSegment> _segments = new();
 
@@ -27,5 +28,10 @@ namespace TqkLibrary.CapcutAuto.Models.Tracks
 
         [JsonProperty("type")]
         public TrackType Type { get; protected set; }
+
+        public IEnumerator GetEnumerator()
+        {
+            return _segments.GetEnumerator();
+        }
     }
 }

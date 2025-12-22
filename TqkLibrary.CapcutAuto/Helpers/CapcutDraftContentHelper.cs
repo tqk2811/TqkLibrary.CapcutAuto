@@ -12,22 +12,11 @@ namespace TqkLibrary.CapcutAuto.Helpers
     public class CapcutDraftContentHelper
     {
         readonly JObject _jobject;
-        readonly JsonSerializerSettings _jsonSerializerSettings;
         readonly JsonSerializer _jsonSerializer;
         public CapcutDraftContentHelper(CapcutTrackCollection capcutTracks)
         {
             this.CapcutTracks = capcutTracks ?? throw new ArgumentNullException(nameof(capcutTracks));
-
-            _jsonSerializerSettings = new JsonSerializerSettings()
-            {
-                Formatting = Formatting.Indented,
-                Converters =
-                [
-                    new CapcutTimeSpanConverter(),
-                    new StringEnumConverter(),
-                ]
-            };
-            _jsonSerializer = JsonSerializer.Create(_jsonSerializerSettings);
+            _jsonSerializer = JsonSerializer.Create(Singleton.JsonSerializerSettings);
 
             var assembly = Assembly.GetExecutingAssembly();
             string resourceName = $"{assembly.GetName().Name}.BaseDraftContent.json";
@@ -44,12 +33,22 @@ namespace TqkLibrary.CapcutAuto.Helpers
         public CapcutDraftContent DraftContent { get; }
         public CapcutTrackCollection CapcutTracks { get; }
 
+
         public string BuildJson()
         {
             //pre calc
+            DraftContent.Id = Guid.NewGuid();
 
-            _jobject["materials"]!["placeholder_infos"] = JArray.FromObject(new string[0]);
-            _jobject["materials"]!["material_colors"] = JArray.FromObject(new string[0]);
+
+
+
+            foreach (JProperty material in _jobject["materials"]!)
+            {
+                if (material?.Value.Type == JTokenType.Array)
+                {
+                    _jobject["materials"]![material.Name] = JArray.FromObject(new object[0]);
+                }
+            }
 
             var textSegments = CapcutTracks
                 .OfType<CapcutTrackText>()
@@ -79,7 +78,7 @@ namespace TqkLibrary.CapcutAuto.Helpers
 
 
             _jobject["tracks"] = JArray.FromObject(CapcutTracks, _jsonSerializer);
-            return JsonConvert.SerializeObject(_jobject);
+            return JsonConvert.SerializeObject(_jobject, Formatting.Indented);
         }
     }
 }

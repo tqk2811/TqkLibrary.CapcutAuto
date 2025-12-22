@@ -6,7 +6,21 @@ namespace TqkLibrary.CapcutAuto.Models.Tracks.Segments
     public sealed class CapcutSegmentVideo : CapcutSegment
     {
         [JsonIgnore]
+        public required CapcutMaterialVideo MaterialVideo { get; set; }
+        protected override CapcutId GetMaterial()
+        {
+            return MaterialVideo;
+        }
+
+
+
+
+
+        [JsonIgnore]
         public CapcutMaterialSpeed MaterialSpeed { get; set; } = new();
+
+        [JsonIgnore]
+        public CapcutMaterialPlaceHolderInfo MaterialPlaceHolderInfo { get; set; } = new();
 
         /// <summary>
         /// Transition to next video
@@ -15,18 +29,44 @@ namespace TqkLibrary.CapcutAuto.Models.Tracks.Segments
         public CapcutMaterialTransition? MaterialTransition { get; set; }
 
         [JsonIgnore]
-        public required CapcutMaterialVideo MaterialVideo { get; set; }
+        public CapcutMaterialCanvasColor MaterialCanvasColor { get; set; } = new();
 
+        [JsonIgnore]
+        public CapcutMaterialAnimation MaterialAnimation { get; set; } = new();
+
+        [JsonIgnore]
+        public CapcutMaterialSoundChannelMapping MaterialSoundChannelMapping { get; set; } = new();
+
+        [JsonIgnore]
+        public CapcutMaterialColor MaterialColor { get; set; } = new();
+
+        [JsonIgnore]
+        public CapcutMaterialVocalSeparation MaterialVocalSeparation { get; set; } = new();
+
+        [JsonProperty("speed")]
+        public override double Speed
+        {
+            get => MaterialSpeed.Speed;
+            set => MaterialSpeed.Speed = value;
+        }
 
         protected override IEnumerable<CapcutId> GetExtraMaterialRefs()
         {
-            yield return MaterialSpeed;
-            if (MaterialTransition is not null)
-                yield return MaterialTransition;
-        }
-        protected override CapcutId GetMaterial()
-        {
-            return MaterialVideo;
+            CapcutId?[] capcutIds = new CapcutId?[]
+            {
+                 MaterialSpeed,//speed
+                 MaterialPlaceHolderInfo,//placeholder_infos
+                 MaterialTransition,//transitions
+                 MaterialCanvasColor,//canvas_color
+                 MaterialAnimation,//material_animations
+                 MaterialSoundChannelMapping,//sound_channel_mappings
+                 MaterialColor,//material_colors
+                 MaterialVocalSeparation//vocal_separations
+            };
+            foreach (CapcutId capcutId in capcutIds.Where(x => x is not null)!)
+            {
+                yield return capcutId;
+            }
         }
     }
 }

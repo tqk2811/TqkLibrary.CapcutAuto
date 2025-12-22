@@ -6,22 +6,32 @@ namespace TqkLibrary.CapcutAuto.Models.Tracks.Segments
     public sealed class CapcutSegmentText : CapcutSegment
     {
         [JsonIgnore]
+        public required CapcutMaterialText MaterialText { get; set; }
+        protected override CapcutId GetMaterial()
+        {
+            return MaterialText;
+        }
+
+
+
+
+        [JsonIgnore]
         public CapcutMaterialAnimation MaterialAnimation { get; set; } = new();
 
         [JsonIgnore]
         public CapcutMaterialEffect? MaterialEffect { get; set; }
 
-        [JsonIgnore]
-        public CapcutMaterialText MaterialText { get; set; } = new();
-
         protected override IEnumerable<CapcutId> GetExtraMaterialRefs()
         {
-            yield return MaterialAnimation;
-            if (MaterialEffect != null) yield return MaterialEffect;
-        }
-        protected override CapcutId GetMaterial()
-        {
-            return MaterialText;
+            CapcutId?[] capcutIds = new CapcutId?[]
+            {
+                 MaterialAnimation,//animation
+                 MaterialEffect,//effect
+            };
+            foreach (CapcutId capcutId in capcutIds.Where(x => x is not null)!)
+            {
+                yield return capcutId;
+            }
         }
     }
 }

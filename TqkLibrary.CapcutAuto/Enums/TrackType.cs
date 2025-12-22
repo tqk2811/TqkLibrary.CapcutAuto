@@ -3,6 +3,7 @@
     public enum TrackType
     {
         video,
-        text
+        text,
+        audio,
     }
 }

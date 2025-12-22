@@ -17,7 +17,7 @@ namespace TqkLibrary.CapcutAuto.JsonConverters
             if (string.IsNullOrEmpty(rawPath))
                 return null;
             string expandedPath = Environment.ExpandEnvironmentVariables(rawPath);
-            return expandedPath;
+            return expandedPath.Replace('\\','/');
         }
 
         public override void WriteJson(JsonWriter writer, string? value, JsonSerializer serializer)

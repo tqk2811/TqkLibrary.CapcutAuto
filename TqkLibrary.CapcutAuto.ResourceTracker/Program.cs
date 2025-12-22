@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using System.CommandLine;
 using System.Timers;
 using System.Transactions;
+using System.Xml.Linq;
 
 string test = JsonConvert.SerializeObject(Guid.NewGuid());
 
@@ -13,6 +14,7 @@ string AnimationsInsDir = Path.Combine(AnimationsDir, "Ins");
 string AnimationsOutsDir = Path.Combine(AnimationsDir, "Outs");
 
 string TransitionsDir = Path.Combine(CapcutDatasDir, "Transitions");
+string EffectsDir = Path.Combine(CapcutDatasDir, "Effects");
 
 Directory.CreateDirectory(AnimationsInsDir);
 Directory.CreateDirectory(AnimationsOutsDir);
@@ -171,6 +173,27 @@ async Task RunAsync(string draftContentFilePath)
                 {
                     Console.WriteLine($"Write transition: {name} ({fileName})");
                     string json = JsonConvert.SerializeObject(transition, Formatting.Indented);
+                    await File.WriteAllTextAsync(jsonFilePath, json);
+                }
+            }
+        }
+
+        var effects = materials["effects"];
+        if (effects is not null && (effects?.Type) == JTokenType.Array)
+        {
+            foreach (var effect in effects)
+            {
+                string? name = effect.Value<string>("name");
+                string? resource_id = effect.Value<string>("resource_id");
+                if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(resource_id))
+                    continue;
+
+                string fileName = $"{resource_id}.json";
+                string jsonFilePath = Path.Combine(EffectsDir, fileName);
+                if (!File.Exists(jsonFilePath))
+                {
+                    Console.WriteLine($"Write transition: {name} ({fileName})");
+                    string json = JsonConvert.SerializeObject(effect, Formatting.Indented);
                     await File.WriteAllTextAsync(jsonFilePath, json);
                 }
             }

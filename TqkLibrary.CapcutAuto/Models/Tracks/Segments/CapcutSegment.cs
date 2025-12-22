@@ -11,7 +11,7 @@ namespace TqkLibrary.CapcutAuto.Models.Tracks.Segments
         public Guid MaterialId => GetMaterial().Id;
 
         [JsonProperty("speed")]
-        public double Speed { get; set; } = 1.0;
+        public virtual double Speed { get; set; } = 1.0;
 
         [JsonProperty("render_index")]
         public long RenderIndex { get; set; } = 0;
