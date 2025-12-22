@@ -10,6 +10,9 @@
   <Project Path="TqkLibrary.CapcutAuto.ConsoleTest/TqkLibrary.CapcutAuto.ConsoleTest.csproj" Id="30c1c5f0-4350-4ca7-b5f8-dcb447533f1e">
     <BuildType Solution="RemoteDebug|*" Project="Debug" />
   </Project>
+  <Project Path="TqkLibrary.CapcutAuto.MsTest/TqkLibrary.CapcutAuto.MsTest.csproj" Id="81230c51-84fc-4906-a1ef-aced8913e9d2">
+    <BuildType Solution="RemoteDebug|*" Project="Debug" />
+  </Project>
   <Project Path="TqkLibrary.CapcutAuto.ResourceTracker/TqkLibrary.CapcutAuto.ResourceTracker.csproj" />
   <Project Path="TqkLibrary.CapcutAuto/TqkLibrary.CapcutAuto.csproj">
     <BuildType Solution="RemoteDebug|*" Project="Debug" />
