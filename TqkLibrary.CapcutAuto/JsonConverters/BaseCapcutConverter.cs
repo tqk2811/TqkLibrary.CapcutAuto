@@ -5,35 +5,38 @@ using TqkLibrary.CapcutAuto.Models;
 
 namespace TqkLibrary.CapcutAuto.JsonConverters
 {
-    public class CapcutIdConverter<TCapcutId> : JsonConverter<TCapcutId>
-        where TCapcutId : CapcutId
+    public class BaseCapcutConverter : JsonConverter
     {
-        public override TCapcutId? ReadJson(
+        public override bool CanConvert(Type objectType)
+        {
+            bool isSubclass = objectType.IsSubclassOf(typeof(BaseCapcut));
+            if (!isSubclass) return false;
+            var constructor = objectType.GetConstructor(
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
+                null,
+                new[] { typeof(JObject) },
+                null
+                );
+            return constructor != null;
+        }
+
+        public override object? ReadJson(
             JsonReader reader,
             Type objectType,
-            TCapcutId? existingValue,
-            bool hasExistingValue,
+            object? existingValue,
             JsonSerializer serializer
             )
         {
             JObject temp = JObject.Load(reader);
 
-            var constructor = typeof(TCapcutId).GetConstructor(
+            var constructor = objectType.GetConstructor(
                 BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,
                 null,
                 new[] { typeof(JObject) },
                 null
-                ); 
+                )!;
 
-            TCapcutId instance;
-            if (constructor != null)
-            {
-                instance = (TCapcutId)constructor.Invoke(new object[] { temp });
-            }
-            else
-            {
-                instance = (TCapcutId)Activator.CreateInstance(typeof(TCapcutId), true)!;
-            }
+            BaseCapcut instance = (BaseCapcut)constructor.Invoke(new object[] { temp });
             serializer.Populate(temp.CreateReader(), instance);
             return instance;
         }
@@ -41,7 +44,7 @@ namespace TqkLibrary.CapcutAuto.JsonConverters
 
         public override void WriteJson(
             JsonWriter writer,
-            TCapcutId? value,
+            object? value,
             JsonSerializer serializer
             )
         {
@@ -51,14 +54,13 @@ namespace TqkLibrary.CapcutAuto.JsonConverters
                 return;
             }
 
-            var instance = (CapcutId)value!;
+            var instance = (BaseCapcut)value!;
             JObject result = instance.GetRawJObject() != null
                 ? (JObject)instance.GetRawJObject()!.DeepClone()
                 : new JObject();
 
-            var contract = serializer.ContractResolver.ResolveContract(typeof(TCapcutId));
-            var oldConverter = contract.Converter;
-            contract.Converter = null;
+            int index = serializer.Converters.IndexOf(this);
+            serializer.Converters.RemoveAt(index);
             try
             {
                 JObject classData = JObject.FromObject(value, serializer);
@@ -71,7 +73,7 @@ namespace TqkLibrary.CapcutAuto.JsonConverters
             }
             finally
             {
-                contract.Converter = oldConverter;
+                serializer.Converters.Insert(index, this);
             }
         }
     }

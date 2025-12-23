@@ -1,0 +1,15 @@
+{
+  "profiles": {
+    "TqkLibrary.CapcutAuto.ResourceTracker": {
+      "commandName": "Project"
+    },
+    "RemoteDebug": {
+      "commandName": "Project",
+      "commandLineArgs": "",
+      "workingDirectory": "\\\\DESKTOP-2COFU4V\\Csharp\\TqkLibrary.CapcutAuto.ConsoleTest\\RemoteDebug\\net8.0-windows10.0.19041.0",
+      "authenticationMode": "Windows",
+      "remoteDebugMachine": "DESKTOP-2COFU4V:4026",
+      "remoteDebugEnabled": true
+    }
+  }
+}

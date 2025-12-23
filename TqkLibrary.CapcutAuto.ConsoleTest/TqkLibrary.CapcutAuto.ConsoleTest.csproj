@@ -1,20 +1,30 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<Configurations>Debug;Release;RemoteDebug</Configurations>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\TqkLibrary.CapcutAuto\TqkLibrary.CapcutAuto.csproj" />
-  </ItemGroup>
+	<PropertyGroup Condition="$(Configuration) == 'RemoteDebug'">
+		<BaseOutputPath>\\DESKTOP-2COFU4V\Csharp\TqkLibrary.CapcutAuto.ConsoleTest</BaseOutputPath>
+	</PropertyGroup>
+	
+	<ItemGroup>
+		<ProjectReference Include="..\TqkLibrary.CapcutAuto\TqkLibrary.CapcutAuto.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Update="Resources\**\*.*">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+	<ItemGroup>
+		<None Update="Resources\**\*.*">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Resources\Projects\" />
+	</ItemGroup>
 
 </Project>
+

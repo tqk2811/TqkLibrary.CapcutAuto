@@ -1,12 +1,13 @@
 ﻿using FFMpegCore;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using TqkLibrary.CapcutAuto.Enums;
 
 namespace TqkLibrary.CapcutAuto.Models.Materials
 {
     public class CapcutMaterialAudio : CapcutMaterial
     {
-        private CapcutMaterialAudio()
+        private CapcutMaterialAudio(JObject jObject) : base(jObject)
         {
             this.Type = MaterialType.extract_music;
         }
@@ -29,7 +30,9 @@ namespace TqkLibrary.CapcutAuto.Models.Materials
             if (mediaAnalysis.PrimaryAudioStream is null)
                 throw new InvalidOperationException($"File had no AudioStream");
 
-            return new CapcutMaterialAudio()
+            string json = Extensions.GetEmbeddedResource("Materials.Audio.json");
+            JObject jObject = JObject.Parse(json);
+            return new CapcutMaterialAudio(jObject)
             {
                 Duration = mediaAnalysis.Duration,
                 Name = fileInfo.Name,

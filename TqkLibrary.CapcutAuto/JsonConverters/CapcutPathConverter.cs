@@ -22,7 +22,14 @@ namespace TqkLibrary.CapcutAuto.JsonConverters
 
         public override void WriteJson(JsonWriter writer, string? value, JsonSerializer serializer)
         {
-            writer.WriteValue(value);
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                writer.WriteValue(string.Empty);
+            }
+            else
+            {
+                writer.WriteValue(value.Replace('\\', '/'));
+            }
         }
     }
 }

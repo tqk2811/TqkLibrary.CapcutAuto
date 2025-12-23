@@ -1,12 +1,14 @@
 ﻿using FFMpegCore;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using TqkLibrary.CapcutAuto.Enums;
+using TqkLibrary.CapcutAuto.JsonConverters;
 
 namespace TqkLibrary.CapcutAuto.Models.Materials
 {
     public class CapcutMaterialVideo : CapcutMaterial
     {
-        private CapcutMaterialVideo()
+        private CapcutMaterialVideo(JObject jObject) : base(jObject)
         {
             this.Type = MaterialType.video;
         }
@@ -39,9 +41,11 @@ namespace TqkLibrary.CapcutAuto.Models.Materials
             if (mediaAnalysis.PrimaryVideoStream is null)
                 throw new InvalidOperationException($"File had no VideoStream");
 
-            return new CapcutMaterialVideo()
+            string json = Extensions.GetEmbeddedResource("Materials.Video.json");
+            JObject jObject = JObject.Parse(json);
+            return new CapcutMaterialVideo(jObject)
             {
-                Path = fileInfo.FullName.Replace('\\','/'),
+                Path = fileInfo.FullName.Replace('\\', '/'),
                 Type = MaterialType.video,
                 MaterialName = fileInfo.Name,
                 Duration = mediaAnalysis.Duration,

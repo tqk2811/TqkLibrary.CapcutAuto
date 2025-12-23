@@ -5,7 +5,6 @@ using TqkLibrary.CapcutAuto.JsonConverters;
 
 namespace TqkLibrary.CapcutAuto.Models.Materials
 {
-    [JsonConverter(typeof(CapcutIdConverter<CapcutMaterialEffect>))]
     public class CapcutMaterialEffect : CapcutMaterial
     {
         [JsonConstructor]

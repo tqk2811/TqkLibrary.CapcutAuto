@@ -7,10 +7,10 @@ namespace TqkLibrary.CapcutAuto.Models
     {
         readonly JObject _jobject;
         readonly JsonSerializer _jsonSerializer;
-        public CapcutDraftContent(JObject jobject, JsonSerializer jsonSerializer)
+        internal CapcutDraftContent(JObject jobject)
         {
             this._jobject = jobject ?? throw new ArgumentNullException(nameof(jobject));
-            this._jsonSerializer = jsonSerializer ?? throw new ArgumentNullException(nameof(jsonSerializer));
+            this._jsonSerializer = JsonSerializer.Create(Singleton.JsonSerializerSettings);
         }
 
         public TimeSpan Duration

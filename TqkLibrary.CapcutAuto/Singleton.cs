@@ -16,6 +16,9 @@ namespace TqkLibrary.CapcutAuto
                 [
                     new CapcutTimeSpanConverter(),
                     new StringEnumConverter(),
+                    new SpecialGuidConverter(),
+                    new BaseCapcutConverter(),
+                    new UnixTimestampConverter(),
                 ]
             };
         }
