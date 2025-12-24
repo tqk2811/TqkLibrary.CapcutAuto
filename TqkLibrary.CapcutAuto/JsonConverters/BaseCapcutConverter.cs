@@ -10,14 +10,15 @@ namespace TqkLibrary.CapcutAuto.JsonConverters
         public override bool CanConvert(Type objectType)
         {
             bool isSubclass = objectType.IsSubclassOf(typeof(BaseCapcut));
-            if (!isSubclass) return false;
-            var constructor = objectType.GetConstructor(
-                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
-                null,
-                new[] { typeof(JObject) },
-                null
-                );
-            return constructor != null;
+            return isSubclass;
+            //if (!isSubclass) return false;
+            //var constructor = objectType.GetConstructor(
+            //    BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
+            //    null,
+            //    new[] { typeof(JObject) },
+            //    null
+            //    );
+            //return constructor != null;
         }
 
         public override object? ReadJson(
@@ -36,7 +37,23 @@ namespace TqkLibrary.CapcutAuto.JsonConverters
                 null
                 )!;
 
-            BaseCapcut instance = (BaseCapcut)constructor.Invoke(new object[] { temp });
+            BaseCapcut instance;
+            if (constructor is null)
+            {
+                constructor = objectType.GetConstructor(
+                    BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,
+                    null,
+                    new Type[0] { },
+                    null
+                )!;
+                instance = (BaseCapcut)constructor.Invoke(new object[] {  });
+            }
+            else
+            {
+                instance = (BaseCapcut)constructor.Invoke(new object[] { temp });
+            }
+
+
             serializer.Populate(temp.CreateReader(), instance);
             return instance;
         }
@@ -59,22 +76,28 @@ namespace TqkLibrary.CapcutAuto.JsonConverters
                 ? (JObject)instance.GetRawJObject()!.DeepClone()
                 : new JObject();
 
-            int index = serializer.Converters.IndexOf(this);
-            serializer.Converters.RemoveAt(index);
-            try
+            var tempSettings = new JsonSerializerSettings
             {
-                JObject classData = JObject.FromObject(value, serializer);
-                result.Merge(classData, new JsonMergeSettings
-                {
-                    MergeArrayHandling = MergeArrayHandling.Replace,
-                    MergeNullValueHandling = MergeNullValueHandling.Merge,
-                });
-                result.WriteTo(writer);
-            }
-            finally
+                Formatting = serializer.Formatting,
+                DateFormatHandling = serializer.DateFormatHandling,
+                DateTimeZoneHandling = serializer.DateTimeZoneHandling,
+                NullValueHandling = serializer.NullValueHandling,
+                ContractResolver = serializer.ContractResolver
+            };
+            foreach (var conv in serializer.Converters)
             {
-                serializer.Converters.Insert(index, this);
+                if (conv is not BaseCapcutConverter)
+                    tempSettings.Converters.Add(conv);
             }
+            JsonSerializer internalSerializer = JsonSerializer.Create(tempSettings);
+
+            JObject classData = JObject.FromObject(value, internalSerializer);
+            result.Merge(classData, new JsonMergeSettings
+            {
+                MergeArrayHandling = MergeArrayHandling.Replace,
+                MergeNullValueHandling = MergeNullValueHandling.Merge,
+            });
+            result.WriteTo(writer);
         }
     }
 }

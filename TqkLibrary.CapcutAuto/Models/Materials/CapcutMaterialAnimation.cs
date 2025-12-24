@@ -5,7 +5,7 @@ using TqkLibrary.CapcutAuto.Models.Resources;
 
 namespace TqkLibrary.CapcutAuto.Models.Materials
 {
-    public class CapcutMaterialAnimation : CapcutMaterial, IEnumerable
+    public class CapcutMaterialAnimation : CapcutMaterial
     {
         readonly List<CapcutAnimation> _animations = new();
 
@@ -21,6 +21,7 @@ namespace TqkLibrary.CapcutAuto.Models.Materials
             Type = MaterialType.sticker_animation;
         }
 
+        [JsonIgnore]
         public CapcutAnimation? In
         {
             get { return _animations.FirstOrDefault(x => x.Type == AnimationType.@in); }
@@ -35,6 +36,8 @@ namespace TqkLibrary.CapcutAuto.Models.Materials
                     _animations.Add(value);
             }
         }
+
+        [JsonIgnore]
         public CapcutAnimation? Out
         {
             get { return _animations.FirstOrDefault(x => x.Type == AnimationType.@out); }
@@ -49,15 +52,5 @@ namespace TqkLibrary.CapcutAuto.Models.Materials
                     _animations.Add(value);
             }
         }
-
-        public void Add(CapcutAnimation capcutAnimation)
-        {
-            if (capcutAnimation is null) throw new ArgumentNullException(nameof(capcutAnimation));
-            if (_animations.Any(x => x.Type == capcutAnimation.Type))
-                throw new InvalidOperationException($"Only two animation in and out");
-            _animations.Add(capcutAnimation);
-        }
-
-        public IEnumerator GetEnumerator() => _animations.GetEnumerator();
     }
 }

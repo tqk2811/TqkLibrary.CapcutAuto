@@ -8,12 +8,13 @@ using System.Text;
 using System.Threading.Tasks;
 using TqkLibrary.CapcutAuto.Enums;
 using TqkLibrary.CapcutAuto.JsonConverters;
+using TqkLibrary.CapcutAuto.Models.Materials;
 
 namespace TqkLibrary.CapcutAuto.Models
 {
     public class DraftMetaInfo : BaseCapcut
     {
-        public DraftMetaInfo() : base(JObject.Parse(Extensions.GetEmbeddedResource("draft_meta_info.json")))
+        public DraftMetaInfo() : base(JObject.Parse(Extensions.GetEmbeddedResourceString("draft_meta_info.json")))
         {
 
         }
@@ -36,82 +37,121 @@ namespace TqkLibrary.CapcutAuto.Models
         public required string DraftRootPath { get; set; }
 
         [JsonProperty("draft_materials")]
-        public List<DraftMaterial> DraftMaterials { get; } = new();
+        public List<DraftMaterial> DraftMaterials { get; } = new()
+        {
+            new DraftMaterial()
+            {
+            }
+        };
 
         public class DraftMaterial
         {
             [JsonProperty("type")]
-            public int Type { get; set; }//0 là file input
+            public int Type { get; }//0 là file input
 
             [JsonProperty("value")]
             public List<DraftMaterialValue> Value { get; set; } = new();
         }
-        public class DraftMaterialValue
+        public abstract class DraftMaterialValue
         {
             [JsonProperty("ai_group_type")]
-            public string AiGroupType { get; set; } = string.Empty;
+            public string AiGroupType { get; } = string.Empty;
 
             [JsonProperty("create_time")]
-            public DateTime CreateTime { get; set; } = DateTime.Now;
+            public DateTime CreateTime { get; } = DateTime.Now;
 
             [JsonProperty("duration")]
-            public TimeSpan Duration { get; set; } = TimeSpan.Zero;
+            public required TimeSpan Duration { get; init; }
 
             [JsonProperty("extra_info")]
-            public required string ExtraInfo { get; set; }//file name
+            public required string ExtraInfo { get; init; }//file name
 
             [JsonProperty("file_Path")]
-            public required string FilePath { get; set; }
-
-            [JsonProperty("height")]
-            public int Height { get; set; } = 0;
+            [JsonConverter(typeof(CapcutPathConverter))]
+            public required string FilePath { get; init; }
 
             [JsonProperty("id")]
-            public Guid Id { get; set; } = Guid.NewGuid();
+            public Guid Id { get; } = Guid.NewGuid();
 
             [JsonProperty("import_time")]
-            public DateTime ImportTime { get; set; } = DateTime.Now;
+            public DateTime ImportTime { get; } = DateTime.Now;
 
             [JsonProperty("import_time_ms")]
-            public long ImportTimeMs => ImportTime.Microsecond;
+            public long ImportTimeMs => (((DateTimeOffset)ImportTime).UtcTicks - DateTimeOffset.UnixEpoch.Ticks) / 10;
 
             [JsonProperty("item_source")]
-            public int ItemSource { get; set; } = 1;
+            public int ItemSource { get; } = 1;
 
             [JsonProperty("md5")]
-            public string Md5 { get; set; } = string.Empty;
+            public string Md5 { get; } = string.Empty;
 
             [JsonProperty("metetype")]
-            public MeteType Metetype { get; set; }
+            public MeteType Metetype { get; protected set; }
 
             [JsonProperty("roughcut_time_range")]
-            public RoughcutTimeRange RoughcutTimeRange { get; set; } = new();
+            public required RoughcutTimeRange RoughcutTimeRange { get; init; }
 
             [JsonProperty("sub_time_range")]
-            public SubTimeRange SubTimeRange { get; set; } = new();
+            public SubTimeRange SubTimeRange { get; } = new();
 
             [JsonProperty("type")]
-            public int Type { get; set; } = 0;
+            public int Type { get; } = 0;
 
             [JsonProperty("width")]
-            public int Width { get; set; } = 0;
+            protected int _Width = 0;
+
+            [JsonProperty("height")]
+            protected int _Height = 0;
+        }
+        public class DraftMaterialValueVideo : DraftMaterialValue
+        {
+            public DraftMaterialValueVideo()
+            {
+                Metetype = MeteType.video;
+            }
+
+            [JsonIgnore]
+            public required int Width
+            {
+                get => _Width;
+                init => _Width = value;
+            }
+
+            [JsonIgnore]
+            public required int Height
+            {
+                get => _Height;
+                init => _Height = value;
+            }
+
+            [JsonIgnore]
+            internal bool HasAudio { get; init; }
+
+            public CapcutMaterialVideo CreateMaterial() => CapcutMaterialVideo.Create(this);
+        }
+        public class DraftMaterialValueAudio : DraftMaterialValue
+        {
+            public DraftMaterialValueAudio()
+            {
+                Metetype = MeteType.music;
+            }
+            public CapcutMaterialAudio CreateMaterial() => CapcutMaterialAudio.Create(this);
         }
         public class RoughcutTimeRange
         {
             [JsonProperty("duration")]
-            public int Duration { get; set; }
+            public required TimeSpan Duration { get; init; }
 
             [JsonProperty("start")]
-            public int Start { get; set; }
+            public required TimeSpan Start { get; init; }
         }
-
         public class SubTimeRange
         {
             [JsonProperty("duration")]
-            public int Duration { get; set; } = -1;
+            public int Duration { get; } = -1;
 
             [JsonProperty("start")]
-            public int Start { get; set; } = -1;
+            public int Start { get; } = -1;
         }
     }
 }

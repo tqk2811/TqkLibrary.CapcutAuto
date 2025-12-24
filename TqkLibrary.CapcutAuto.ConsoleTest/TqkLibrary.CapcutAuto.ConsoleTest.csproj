@@ -22,9 +22,5 @@
 		</None>
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="Resources\Projects\" />
-	</ItemGroup>
-
 </Project>
 

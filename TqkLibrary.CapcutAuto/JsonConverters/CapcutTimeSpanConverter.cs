@@ -4,8 +4,6 @@ namespace TqkLibrary.CapcutAuto.JsonConverters
 {
     public class CapcutTimeSpanConverter : JsonConverter
     {
-        private const long MicroFactor = 10;
-
         public override bool CanConvert(Type objectType)
         {
             return objectType == typeof(TimeSpan) || objectType == typeof(TimeSpan?);
@@ -22,8 +20,8 @@ namespace TqkLibrary.CapcutAuto.JsonConverters
                 return;
             }
 
-            TimeSpan ts = (TimeSpan)value;
-            writer.WriteValue(ts.Ticks / MicroFactor);
+            TimeSpan ts = (TimeSpan)value;            
+            writer.WriteValue((long)ts.TotalMicroseconds);
         }
         public override object? ReadJson(
             JsonReader reader,
@@ -39,7 +37,7 @@ namespace TqkLibrary.CapcutAuto.JsonConverters
 
             if (long.TryParse(reader.Value?.ToString(), out long microValue))
             {
-                return TimeSpan.FromTicks(microValue * MicroFactor);
+                return TimeSpan.FromMicroseconds(microValue);
             }
             return null;
         }

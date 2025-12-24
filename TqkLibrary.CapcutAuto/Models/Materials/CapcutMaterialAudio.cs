@@ -21,24 +21,39 @@ namespace TqkLibrary.CapcutAuto.Models.Materials
         [JsonProperty("duration")]
         public required TimeSpan Duration { get; init; }
 
-        public static async Task<CapcutMaterialAudio> CreateAsync(string audioFilePath, CancellationToken cancellationToken = default)
-        {
-            FileInfo fileInfo = new(audioFilePath);
-            if (!fileInfo.Exists)
-                throw new FileNotFoundException(audioFilePath);
-            IMediaAnalysis mediaAnalysis = await FFProbe.AnalyseAsync(audioFilePath, cancellationToken: cancellationToken);
-            if (mediaAnalysis.PrimaryAudioStream is null)
-                throw new InvalidOperationException($"File had no AudioStream");
+        [JsonProperty("local_material_id")]
+        public required Guid LocalMaterialId { get; init; }
 
-            string json = Extensions.GetEmbeddedResource("Materials.Audio.json");
+        //public static async Task<CapcutMaterialAudio> CreateAsync(string audioFilePath, CancellationToken cancellationToken = default)
+        //{
+        //    FileInfo fileInfo = new(audioFilePath);
+        //    if (!fileInfo.Exists)
+        //        throw new FileNotFoundException(audioFilePath);
+        //    IMediaAnalysis mediaAnalysis = await FFProbe.AnalyseAsync(audioFilePath, cancellationToken: cancellationToken);
+        //    if (mediaAnalysis.PrimaryAudioStream is null)
+        //        throw new InvalidOperationException($"File had no AudioStream");
+
+        //    string json = Extensions.GetEmbeddedResource("Materials.Audio.json");
+        //    JObject jObject = JObject.Parse(json);
+        //    return new CapcutMaterialAudio(jObject)
+        //    {
+        //        Duration = mediaAnalysis.Duration,
+        //        Name = fileInfo.Name,
+        //        Path = fileInfo.FullName.Replace('\\', '/'),
+        //    };
+        //}
+
+        internal static CapcutMaterialAudio Create(DraftMetaInfo.DraftMaterialValueAudio draftMaterialValueAudio)
+        {
+            string json = Extensions.GetEmbeddedResourceString("Materials.Audio.json");
             JObject jObject = JObject.Parse(json);
             return new CapcutMaterialAudio(jObject)
             {
-                Duration = mediaAnalysis.Duration,
-                Name = fileInfo.Name,
-                Path = fileInfo.FullName.Replace('\\', '/'),
+                Duration = draftMaterialValueAudio.Duration,
+                Name = draftMaterialValueAudio.ExtraInfo,
+                Path = draftMaterialValueAudio.FilePath,
+                LocalMaterialId = draftMaterialValueAudio.Id,
             };
         }
-
     }
 }

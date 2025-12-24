@@ -4,7 +4,7 @@ using TqkLibrary.CapcutAuto.JsonConverters;
 
 namespace TqkLibrary.CapcutAuto.Models.Resources
 {
-    public class CapcutAnimation
+    public class CapcutAnimation : BaseCapcut
     {
         [JsonConstructor]
         private CapcutAnimation()

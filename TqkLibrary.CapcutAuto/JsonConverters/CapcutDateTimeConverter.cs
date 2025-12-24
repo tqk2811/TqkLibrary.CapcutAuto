@@ -2,7 +2,7 @@
 
 namespace TqkLibrary.CapcutAuto.JsonConverters
 {
-    public class UnixTimestampConverter : JsonConverter<DateTime>
+    public class CapcutDateTimeConverter : JsonConverter<DateTime>
     {
         public override void WriteJson(JsonWriter writer, DateTime value, JsonSerializer serializer)
         {

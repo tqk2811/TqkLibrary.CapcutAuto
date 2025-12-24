@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FFMpegCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -48,7 +49,69 @@ namespace TqkLibrary.CapcutAuto.Helpers
 
         public CapcutDraftContentHelper DraftContent { get; } = new();
 
+        public async Task<DraftMetaInfo.DraftMaterialValueVideo> AddVideoFileAsync(string videoFilePath, CancellationToken cancellationToken = default)
+        {
+            FileInfo fileInfo = new(videoFilePath);
+            if (!fileInfo.Exists)
+                throw new FileNotFoundException(videoFilePath);
 
+            var draftMaterial = _draftMetaInfo.DraftMaterials.First(x => x.Type == 0);
+            if (draftMaterial.Value.Any(x => x.FilePath.Equals(fileInfo.FullName, StringComparison.OrdinalIgnoreCase)))
+            {
+                throw new Exception("Dupp file input");
+            }
+
+            IMediaAnalysis mediaAnalysis = await FFProbe.AnalyseAsync(videoFilePath, cancellationToken: cancellationToken);
+            if (mediaAnalysis.PrimaryVideoStream is null)
+                throw new InvalidOperationException($"File had no VideoStream");
+
+            DraftMetaInfo.DraftMaterialValueVideo value = new()
+            {
+                ExtraInfo = fileInfo.Name,
+                FilePath = fileInfo.FullName,
+                Height = mediaAnalysis.PrimaryVideoStream.Height,
+                Width = mediaAnalysis.PrimaryVideoStream.Width,
+                RoughcutTimeRange = new()
+                {
+                    Duration = mediaAnalysis.Duration,
+                    Start = TimeSpan.Zero,
+                },
+                Duration = mediaAnalysis.Duration,
+                HasAudio = mediaAnalysis.PrimaryAudioStream is not null,
+            };
+            draftMaterial.Value.Add(value);
+            return value;
+        }
+        public async Task<DraftMetaInfo.DraftMaterialValueAudio> AddAudioFileAsync(string audioFilePath, CancellationToken cancellationToken = default)
+        {
+            FileInfo fileInfo = new(audioFilePath);
+            if (!fileInfo.Exists)
+                throw new FileNotFoundException(audioFilePath);
+
+            var draftMaterial = _draftMetaInfo.DraftMaterials.First(x => x.Type == 0);
+            if (draftMaterial.Value.Any(x => x.FilePath.Equals(fileInfo.FullName, StringComparison.OrdinalIgnoreCase)))
+            {
+                throw new Exception("Dupp file input");
+            }
+
+            IMediaAnalysis mediaAnalysis = await FFProbe.AnalyseAsync(audioFilePath, cancellationToken: cancellationToken);
+            if (mediaAnalysis.PrimaryAudioStream is null)
+                throw new InvalidOperationException($"File had no AudioStream");
+
+            DraftMetaInfo.DraftMaterialValueAudio value = new()
+            {
+                ExtraInfo = fileInfo.Name,
+                FilePath = fileInfo.FullName,
+                RoughcutTimeRange = new()
+                {
+                    Duration = mediaAnalysis.Duration,
+                    Start = TimeSpan.Zero,
+                },
+                Duration = mediaAnalysis.Duration,
+            };
+            draftMaterial.Value.Add(value);
+            return value;
+        }
 
 
         public async Task WriteProjectAsync(CancellationToken cancellationToken = default)
@@ -56,9 +119,22 @@ namespace TqkLibrary.CapcutAuto.Helpers
             //update _rootMetaInfo and _draftMetaInfo from DraftContent
 
 
-
+            if (Directory.Exists(_draftMetaInfo.DraftFolderPath))
+            {
+                await Task.Factory.StartNew(() => Directory.Delete(_draftMetaInfo.DraftFolderPath, true), TaskCreationOptions.LongRunning);
+            }
             Directory.CreateDirectory(_draftMetaInfo.DraftFolderPath);
 
+            using (Stream cover_stream = Extensions.GetEmbeddedResourceStream("cover.jpg"))
+            {
+                using FileStream fileStream = new FileStream(
+                    Path.Combine(_draftMetaInfo.DraftFolderPath, "draft_cover.jpg"),
+                    FileMode.Create,
+                    FileAccess.Write,
+                    FileShare.Read
+                    );
+                await cover_stream.CopyToAsync(fileStream, cancellationToken);
+            }
             await File.WriteAllTextAsync(
                 Path.Combine(DraftRootPath, "root_meta_info.json"),
                 _rootMetaInfo.GetCapcutJsonString(),

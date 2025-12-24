@@ -13,7 +13,19 @@ namespace TqkLibrary.CapcutAuto
 {
     public static class Extensions
     {
-        public static T Clone<T>(this T t) where T : CapcutMaterial
+        public static T SetProp<T>(this T obj, Action<T> action)
+        {
+            action.Invoke(obj);
+            return obj;
+        }
+        public static T Clone<T>(this T t) where T : BaseCapcut
+        {
+            string text_json = JsonConvert.SerializeObject(t, Singleton.JsonSerializerSettings);
+            T clone = JsonConvert.DeserializeObject<T>(text_json, Singleton.JsonSerializerSettings)!;
+            clone.SetRawJObject(t.GetRawJObject());
+            return clone;
+        }
+        public static T CloneWithRandomId<T>(this T t) where T : CapcutId
         {
             string text_json = JsonConvert.SerializeObject(t, Singleton.JsonSerializerSettings);
             T clone = JsonConvert.DeserializeObject<T>(text_json, Singleton.JsonSerializerSettings)!;
@@ -26,7 +38,7 @@ namespace TqkLibrary.CapcutAuto
             return JsonConvert.SerializeObject(obj, Singleton.JsonSerializerSettings);
         }
 
-        public static string GetEmbeddedResource(string name)
+        public static string GetEmbeddedResourceString(string name)
         {
             var assembly = Assembly.GetExecutingAssembly();
             string resourceName = $"{assembly.GetName().Name}.EmbeddedResources.{name}";
@@ -35,6 +47,12 @@ namespace TqkLibrary.CapcutAuto
                 using StreamReader streamReader = new StreamReader(stream);
                 return streamReader.ReadToEnd();
             }
+        }
+        public static Stream GetEmbeddedResourceStream(string name)
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+            string resourceName = $"{assembly.GetName().Name}.EmbeddedResources.{name}";
+            return assembly.GetManifestResourceStream(resourceName)!;
         }
     }
 }

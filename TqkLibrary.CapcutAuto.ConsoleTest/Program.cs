@@ -26,128 +26,150 @@ foreach (var file in Directory.GetFiles(".\\CapcutDatas\\Animations\\Outs", "*.j
     string json_text = await File.ReadAllTextAsync(file);
     out_animations.Add(CapcutAnimation.Parse(json_text));
 }
-
+CapcutMaterialText capcutMaterialText = CapcutMaterialText.CreateDefault();
 
 
 FileInfo videoFileInfo = new FileInfo(".\\Resources\\OriginalVideo.mp4");
+FileInfo audioFileInfo = new FileInfo(".\\Resources\\tts_000.ogg");
+
 #if REMOTEDEBUG
 videoFileInfo = videoFileInfo.CopyTo("C:\\OriginalVideo.mp4", true);
-#endif
-CapcutMaterialVideo capcutMaterialVideo = await CapcutMaterialVideo.CreateAsync(videoFileInfo.FullName);
-
-FileInfo audioFileInfo = new FileInfo(".\\Resources\\tts_000.ogg");
-#if REMOTEDEBUG
 audioFileInfo = audioFileInfo.CopyTo("C:\\tts_000.ogg", true);
 #endif
-CapcutMaterialAudio capcutMaterialAudio = await CapcutMaterialAudio.CreateAsync(audioFileInfo.FullName);
+
+CapcutProjectHelper capcutProjectHelper = new CapcutProjectHelper("myproj");
+
+var materialVideo = await capcutProjectHelper.AddVideoFileAsync(videoFileInfo.FullName);
+var materialAudio = await capcutProjectHelper.AddAudioFileAsync(audioFileInfo.FullName);
 
 
-
-
-CapcutTrackCollection capcutTracks = new()
+capcutProjectHelper.DraftContent.CapcutTracks.Add(new CapcutTrackVideo()
 {
-    new CapcutTrackVideo()
+    new CapcutSegmentVideo()
     {
-        new CapcutSegmentVideo()
+        MaterialVideo = materialVideo.CreateMaterial(),
+        TargetTimerange = new()
         {
-            MaterialVideo = capcutMaterialVideo.Clone(),
-            MaterialSpeed = new()
-            {
-
-            },
-            MaterialTransition = capcutMaterialTransitions.First().Clone(),
-            TargetTimerange = new()
-            {
-
-            },
-            Speed = 1.0,
-
-            Volume = 0.0,
+            Start = TimeSpan.Zero,
+            Duration = TimeSpan.FromSeconds(5),
         },
-        new CapcutSegmentVideo()
+        Speed = 1.0,
+        Volume = 0.0,
+        MaterialTransition = capcutMaterialTransitions[Random.Shared.Next(capcutMaterialTransitions.Count)]
+            .CloneWithRandomId()
+            .SetProp(x => x.Duration = TimeSpan.FromSeconds(1.5)),
+    },
+    new CapcutSegmentVideo()
+    {
+        MaterialVideo = materialVideo.CreateMaterial(),
+        TargetTimerange = new()
         {
-            MaterialVideo = capcutMaterialVideo.Clone(),
-            MaterialSpeed = new()
-            {
-
-            },
-            MaterialTransition = capcutMaterialTransitions.First().Clone(),
-            TargetTimerange = new()
-            {
-
-            },
-            Speed = 1.0,
-
-            Volume = 0.0,
+            Start = TimeSpan.FromSeconds(25),
+            Duration = TimeSpan.FromSeconds(5),
         },
+        Speed = 1.0,
+        Volume = 0.0,
+        MaterialTransition = capcutMaterialTransitions[Random.Shared.Next(capcutMaterialTransitions.Count)]
+            .CloneWithRandomId()
+            .SetProp(x => x.Duration = TimeSpan.FromSeconds(2.5)),
     },
-    new CapcutTrackAudio()
+    new CapcutSegmentVideo()
     {
-        new CapcutSegmentAudio()
+        MaterialVideo = materialVideo.CreateMaterial(),
+        TargetTimerange = new()
         {
-            MaterialAudio = capcutMaterialAudio.Clone(),
-            TargetTimerange = new()
-            {
-
-            },
-            Volume = 1.0,
-            Speed = 1.0,
-        }
+            Start = TimeSpan.FromSeconds(45),
+            Duration =TimeSpan.FromSeconds(5),
+        },
+        Speed = 1.0,
+        Volume = 0.0,
     },
-    new CapcutTrackText()
+});
+capcutProjectHelper.DraftContent.CapcutTracks.Add(new CapcutTrackAudio()
+{
+    new CapcutSegmentAudio()
     {
-        //new CapcutSegmentText()
-        //{
-            
-        //},
+        MaterialAudio = materialAudio.CreateMaterial(),
+        TargetTimerange = new()
+        {
+            Start = TimeSpan.Zero,
+            Duration = materialAudio.Duration,
+        },
+        Volume = 1.0,
+        Speed = 1.0,
     }
-};
-CapcutDraftContentHelper capcutDraftContentHelper = new(capcutTracks);
-//capcutDraftContentHelper.DraftContent.
-string draft_content_json = capcutDraftContentHelper.BuildJson();
+});
 
-
-string rootDir = Path.Combine(
-    Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
-    "AppData\\Local\\CapCut\\User Data\\Projects\\com.lveditor.draft"
-    );
-string root_meta_info_file = Path.Combine(rootDir, "root_meta_info.json");
-
-string projectName = "myproj";
-string projectDir = Path.Combine(rootDir, projectName);
-Directory.CreateDirectory(projectDir);
-string draft_meta_info_file = Path.Combine(projectDir, "draft_meta_info.json");
-
-foreach (var file in Directory.GetFiles(".\\Resources\\Projects"))
+var text0 = capcutMaterialText.CloneWithRandomId();
+text0.ContentHelper.Text = "Đây là văn bản A";
+text0.ContentHelper.Styles.First().Range = new() { 0, text0.ContentHelper.Text.Length };
+var text1 = capcutMaterialText.CloneWithRandomId();
+text1.ContentHelper.Text = "Đây là văn bản GHI";
+text1.ContentHelper.Styles.First().Range = new() { 0, text1.ContentHelper.Text.Length };
+var text2 = capcutMaterialText.CloneWithRandomId();
+text2.ContentHelper.Text = "Đây là văn bản sdsadsadsadsa";
+text2.ContentHelper.Styles.First().Range = new() { 0, text2.ContentHelper.Text.Length };
+capcutProjectHelper.DraftContent.CapcutTracks.Add(new CapcutTrackText()
 {
-    FileInfo fileInfo = new FileInfo(file);
-    fileInfo.CopyTo(Path.Combine(projectDir, fileInfo.Name), true);
-}
-
-string draft_content_file = Path.Combine(projectDir, "draft_content.json");
-await File.WriteAllTextAsync(draft_content_file, draft_content_json);
-
-string draft_cover_file = Path.Combine(projectDir, "draft_cover.jpg");
-File.Copy(".\\Resources\\cover.jpg", draft_cover_file, true);
-
-RootMetaInfo rootMetaInfo = new RootMetaInfo()
-{
-    DraftIds = 2,
-    RootPath = rootDir,
-    AllDraftStore = new()
+    new CapcutSegmentText()
     {
-        new()
+        MaterialText = text0,
+        TargetTimerange = new()
         {
-            DraftFoldPath = projectDir,
-            DraftJsonFile =  draft_content_file,
-            DraftName = projectName,
-            DraftRootPath = rootDir,
-        }
+            Start = TimeSpan.Zero,
+            Duration = TimeSpan.FromSeconds(5),
+        },
+        Volume = 0.0,
+        MaterialAnimation = new()
+        {
+            In = in_animations[Random.Shared.Next(in_animations.Count)]
+                .Clone()
+                .SetProp(x => x.Duration = TimeSpan.FromSeconds(2)),
+            Out = out_animations[Random.Shared.Next(out_animations.Count)]
+                .Clone()
+                .SetProp(x => x.Duration = TimeSpan.FromSeconds(2)),
+        },
     },
-};
-await File.WriteAllTextAsync(root_meta_info_file, rootMetaInfo.GetCapcutJsonString());
+    new CapcutSegmentText()
+    {
+        MaterialText = text1,
+        TargetTimerange = new()
+        {
+            Start = TimeSpan.FromSeconds(5),
+            Duration = TimeSpan.FromSeconds(5),
+        },
+        Volume = 0.0,
+        MaterialAnimation = new()
+        {
+            In = in_animations[Random.Shared.Next(in_animations.Count)]
+                .Clone()
+                .SetProp(x => x.Duration = TimeSpan.FromSeconds(1.5)),
+            Out = out_animations[Random.Shared.Next(out_animations.Count)]
+                .Clone()
+                .SetProp(x => x.Duration = TimeSpan.FromSeconds(1.5)),
+        },
+    },
+    new CapcutSegmentText()
+    {
+        MaterialText = text2,
+        TargetTimerange = new()
+        {
+            Start = TimeSpan.FromSeconds(10),
+            Duration = TimeSpan.FromSeconds(5),
+        },
+        Volume = 0.0,
+        MaterialAnimation = new()
+        {
+            In = in_animations[Random.Shared.Next(in_animations.Count)]
+                .Clone()
+                .SetProp(x => x.Duration = TimeSpan.FromSeconds(1)),
+            Out = out_animations[Random.Shared.Next(out_animations.Count)]
+                .Clone()
+                .SetProp(x => x.Duration = TimeSpan.FromSeconds(1)),
+        },
+    },
+});
 
-DraftMetaInfo draftMetaInfo = DraftMetaInfo.Create(projectDir, "draft_cover.jpg", projectName, rootDir);
-await File.WriteAllTextAsync(draft_meta_info_file, draftMetaInfo.GetJsonString());
+await capcutProjectHelper.WriteProjectAsync();
 
 Console.ReadLine();

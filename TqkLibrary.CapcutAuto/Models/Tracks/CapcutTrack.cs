@@ -5,6 +5,7 @@ using TqkLibrary.CapcutAuto.Models.Tracks.Segments;
 
 namespace TqkLibrary.CapcutAuto.Models.Tracks
 {
+    [JsonObject(MemberSerialization.OptOut)]
     public abstract class CapcutTrack : CapcutId, IEnumerable
     {
         protected readonly List<CapcutSegment> _segments = new();

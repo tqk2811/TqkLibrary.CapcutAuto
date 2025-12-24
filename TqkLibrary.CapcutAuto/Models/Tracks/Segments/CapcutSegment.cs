@@ -5,10 +5,16 @@ namespace TqkLibrary.CapcutAuto.Models.Tracks.Segments
     public abstract class CapcutSegment : CapcutId
     {
         [JsonProperty("extra_material_refs")]
-        public IEnumerable<Guid> ExtraMaterialRefs => GetExtraMaterialRefs().Select(x => x.Id).ToArray();
+        public IEnumerable<Guid> ExtraMaterialRefs
+        {
+            get { return GetExtraMaterialRefs().Select(x => x.Id).ToArray(); }
+        }
 
         [JsonProperty("material_id")]
-        public Guid MaterialId => GetMaterial().Id;
+        public Guid MaterialId
+        {
+            get { return GetMaterial().Id; }
+        }
 
         [JsonProperty("speed")]
         public virtual double Speed { get; set; } = 1.0;

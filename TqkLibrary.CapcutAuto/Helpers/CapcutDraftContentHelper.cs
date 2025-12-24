@@ -17,7 +17,7 @@ namespace TqkLibrary.CapcutAuto.Helpers
         {
             _jsonSerializer = JsonSerializer.Create(Singleton.JsonSerializerSettings);
 
-            _jobject = JObject.Parse(Extensions.GetEmbeddedResource("draft_content.json"));
+            _jobject = JObject.Parse(Extensions.GetEmbeddedResourceString("draft_content.json"));
             this.DraftContent = new CapcutDraftContent(_jobject);
         }
 
@@ -47,10 +47,8 @@ namespace TqkLibrary.CapcutAuto.Helpers
                 .SelectMany(x => x.Segments)
                 .OfType<CapcutSegmentText>();
             var materials_texts = textSegments.Select(x => x.MaterialText).Where(x => x is not null).ToArray();
-            var materials_animations = textSegments.Select(x => x.MaterialAnimation).Where(x => x is not null).ToArray();
             var materials_effects = textSegments.Select(x => x.MaterialEffect).Where(x => x is not null).ToArray();
             _jobject["materials"]!["texts"] = JArray.FromObject(materials_texts, _jsonSerializer);
-            _jobject["materials"]!["material_animations"] = JArray.FromObject(materials_animations);//text animation
             _jobject["materials"]!["effects"] = JArray.FromObject(materials_effects);
 
             var videoSegments = CapcutTracks
@@ -60,12 +58,10 @@ namespace TqkLibrary.CapcutAuto.Helpers
             var materials_videos = videoSegments.Select(x => x.MaterialVideo).Where(x => x is not null).ToArray();
             var materials_v_transitions = videoSegments.Select(x => x.MaterialTransition).Where(x => x is not null).ToArray();
             var materials_v_canvases = videoSegments.Select(x => x.MaterialCanvasColor).Where(x => x is not null).ToArray();
-            var materials_v_animations = videoSegments.Select(x => x.MaterialAnimation).Where(x => x is not null).ToArray();
             var materials_v_colors = videoSegments.Select(x => x.MaterialColor).Where(x => x is not null).ToArray();
             _jobject["materials"]!["videos"] = JArray.FromObject(materials_videos, _jsonSerializer);
             _jobject["materials"]!["transitions"] = JArray.FromObject(materials_v_transitions, _jsonSerializer);
             _jobject["materials"]!["canvases"] = JArray.FromObject(materials_v_canvases, _jsonSerializer);
-            _jobject["materials"]!["material_animations"] = JArray.FromObject(materials_v_animations, _jsonSerializer);
             _jobject["materials"]!["material_colors"] = JArray.FromObject(materials_v_colors, _jsonSerializer);
 
             var audioSegments = CapcutTracks
@@ -84,6 +80,11 @@ namespace TqkLibrary.CapcutAuto.Helpers
             _jobject["materials"]!["speeds"] = JArray.FromObject(speeds.ToArray(), _jsonSerializer);
 
 
+            var materials_t_animations = textSegments.Select(x => x.MaterialAnimation).Where(x => x is not null).ToArray();
+            var materials_v_animations = videoSegments.Select(x => x.MaterialAnimation).Where(x => x is not null).ToArray();
+            var material_animations = materials_t_animations.Concat(materials_v_animations).ToArray();
+            _jobject["materials"]!["material_animations"] = JArray.FromObject(material_animations, _jsonSerializer);//text animation
+
             var materials_v_placeholderinfos = videoSegments.Select(x => x.MaterialPlaceHolderInfo).Where(x => x is not null).ToArray();
             var materials_a_placeholderinfos = audioSegments.Select(x => x.MaterialPlaceHolderInfo).Where(x => x is not null).ToArray();
             var placeholderinfos = materials_v_placeholderinfos.Concat(materials_a_placeholderinfos);
@@ -101,8 +102,11 @@ namespace TqkLibrary.CapcutAuto.Helpers
             var vocals = materials_v_vocals.Concat(materials_a_vocals);
             _jobject["materials"]!["vocal_separations"] = JArray.FromObject(vocals.ToArray(), _jsonSerializer);
 
-
-            _jobject["tracks"] = JArray.FromObject(CapcutTracks, _jsonSerializer);
+            JArray tracks = JArray.FromObject(CapcutTracks, _jsonSerializer);
+#if DEBUG
+            string json = JsonConvert.SerializeObject(tracks, Formatting.Indented);
+#endif
+            _jobject["tracks"] = tracks;
             return JsonConvert.SerializeObject(_jobject, Formatting.Indented);
         }
     }

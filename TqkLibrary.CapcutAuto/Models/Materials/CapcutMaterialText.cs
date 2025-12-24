@@ -42,6 +42,11 @@ namespace TqkLibrary.CapcutAuto.Models.Materials
             return JsonConvert.DeserializeObject<CapcutMaterialText>(json, Singleton.JsonSerializerSettings)!;
         }
 
+        public static CapcutMaterialText CreateDefault()
+        {
+            string json = Extensions.GetEmbeddedResourceString("Materials.text.json");
+            return Parse(json);
+        }
 
         public class _ContentHelper
         {
