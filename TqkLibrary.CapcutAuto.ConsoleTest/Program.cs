@@ -1,12 +1,10 @@
-﻿
-
-using TqkLibrary.CapcutAuto;
-using TqkLibrary.CapcutAuto.Helpers;
-using TqkLibrary.CapcutAuto.Models;
-using TqkLibrary.CapcutAuto.Models.Materials;
-using TqkLibrary.CapcutAuto.Models.Resources;
-using TqkLibrary.CapcutAuto.Models.Tracks;
-using TqkLibrary.CapcutAuto.Models.Tracks.Segments;
+﻿using TqkLibrary.CapcutAuto.ResourceGenerate;
+using TqkLibrary.CapcutAuto.ResourceGenerate.Helpers;
+using TqkLibrary.CapcutAuto.ResourceGenerate.Models;
+using TqkLibrary.CapcutAuto.ResourceGenerate.Models.Materials;
+using TqkLibrary.CapcutAuto.ResourceGenerate.Models.Resources;
+using TqkLibrary.CapcutAuto.ResourceGenerate.Models.Tracks;
+using TqkLibrary.CapcutAuto.ResourceGenerate.Models.Tracks.Segments;
 
 List<CapcutMaterialTransition> capcutMaterialTransitions = new List<CapcutMaterialTransition>();
 foreach (var file in Directory.GetFiles(".\\CapcutDatas\\Transitions", "*.json"))

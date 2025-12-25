@@ -11,6 +11,9 @@
   <Project Path="TqkLibrary.CapcutAuto.MsTest/TqkLibrary.CapcutAuto.MsTest.csproj" Id="81230c51-84fc-4906-a1ef-aced8913e9d2">
     <BuildType Solution="RemoteDebug|*" Project="Debug" />
   </Project>
+  <Project Path="TqkLibrary.CapcutAuto.ResourceGenerate/TqkLibrary.CapcutAuto.ResourceGenerate.csproj" Id="552c1bb0-3c21-4ae7-94b0-7ed8f2164886">
+    <BuildType Solution="RemoteDebug|*" Project="Debug" />
+  </Project>
   <Project Path="TqkLibrary.CapcutAuto.ResourceTracker/TqkLibrary.CapcutAuto.ResourceTracker.csproj" />
   <Project Path="TqkLibrary.CapcutAuto/TqkLibrary.CapcutAuto.csproj">
     <BuildType Solution="RemoteDebug|*" Project="Debug" />

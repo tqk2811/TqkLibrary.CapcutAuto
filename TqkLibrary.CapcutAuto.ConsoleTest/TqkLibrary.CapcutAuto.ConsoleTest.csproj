@@ -11,9 +11,9 @@
 	<PropertyGroup Condition="$(Configuration) == 'RemoteDebug'">
 		<BaseOutputPath>\\DESKTOP-2COFU4V\Csharp\TqkLibrary.CapcutAuto.ConsoleTest</BaseOutputPath>
 	</PropertyGroup>
-	
+
 	<ItemGroup>
-		<ProjectReference Include="..\TqkLibrary.CapcutAuto\TqkLibrary.CapcutAuto.csproj" />
+	  <ProjectReference Include="..\TqkLibrary.CapcutAuto.ResourceGenerate\TqkLibrary.CapcutAuto.ResourceGenerate.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using TqkLibrary.CapcutAuto.Models.Materials;
+using TqkLibrary.CapcutAuto.ResourceGenerate.Models.Materials;
 
 namespace TqkLibrary.CapcutAuto.MsTest
 {

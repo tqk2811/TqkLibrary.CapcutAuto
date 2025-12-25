@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TqkLibrary.CapcutAuto.ResourceGenerate\TqkLibrary.CapcutAuto.ResourceGenerate.csproj" />
     <ProjectReference Include="..\TqkLibrary.CapcutAuto\TqkLibrary.CapcutAuto.csproj" />
   </ItemGroup>
 

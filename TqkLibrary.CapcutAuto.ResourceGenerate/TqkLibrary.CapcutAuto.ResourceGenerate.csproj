@@ -3,6 +3,10 @@
 	<Import Project="..\ProjectBuildProperties.targets" />
 
 	<ItemGroup>
+		<EmbeddedResource Include="EmbeddedResources\**\*.*" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="FFMpegCore" Version="5.4.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
 	</ItemGroup>

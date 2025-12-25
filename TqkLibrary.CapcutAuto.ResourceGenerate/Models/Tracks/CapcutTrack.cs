@@ -1,0 +1,38 @@
+﻿using Newtonsoft.Json;
+using System.Collections;
+using TqkLibrary.CapcutAuto.ResourceGenerate.Enums;
+using TqkLibrary.CapcutAuto.ResourceGenerate.Models.Tracks.Segments;
+
+namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Tracks
+{
+    [JsonObject(MemberSerialization.OptOut)]
+    public abstract class CapcutTrack : CapcutId, IEnumerable
+    {
+        protected readonly List<CapcutSegment> _segments = new();
+
+
+
+        [JsonProperty("attribute")]
+        public int Attribute { get; set; }
+
+        [JsonProperty("flag")]
+        public int Flag { get; set; }
+
+        [JsonProperty("is_default_name")]
+        public bool IsDefaultName { get; set; }
+
+        [JsonProperty("name")]
+        public string Name { get; set; } = string.Empty;
+
+        [JsonProperty("segments")]
+        public IReadOnlyList<CapcutSegment> Segments => _segments;
+
+        [JsonProperty("type")]
+        public TrackType Type { get; protected set; }
+
+        public IEnumerator GetEnumerator()
+        {
+            return _segments.GetEnumerator();
+        }
+    }
+}
