@@ -13,7 +13,7 @@
   "base_content": "",
   "bold_width": 0.0,
   "border_alpha": 1.0,
-  "border_color": "#ffffff",
+  "border_color": "#000000",
   "border_width": 0.08,
   "caption_template_info": {
     "category_id": "",
@@ -104,7 +104,7 @@
   "relevance_segment": [],
   "shadow_alpha": 0.9,
   "shadow_angle": -45.0,
-  "shadow_color": "#000000",
+  "shadow_color": "#b61b1c",
   "shadow_distance": 5.0,
   "shadow_point": {
     "x": 0.6363961030678928,
