@@ -5,7 +5,7 @@
     },
     "RemoteDebug": {
       "commandName": "Project",
-      "commandLineArgs": "--draft_content \"C:\\Users\\tqk2811\\AppData\\Local\\CapCut\\User Data\\Projects\\com.lveditor.draft\\1217\\draft_content.json\"",
+      "commandLineArgs": "--draft_content \"C:\\Users\\tqk2811\\AppData\\Local\\CapCut\\User Data\\Projects\\com.lveditor.draft\\myproj\\draft_content.json\"",
       "workingDirectory": "\\\\DESKTOP-2COFU4V\\Csharp\\TqkLibrary.CapcutAuto.ResourceTracker\\RemoteDebug\\net8.0",
       "authenticationMode": "Windows",
       "remoteDebugMachine": "DESKTOP-2COFU4V:4026",

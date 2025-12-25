@@ -15,10 +15,14 @@ string AnimationsOutsDir = Path.Combine(AnimationsDir, "Outs");
 
 string TransitionsDir = Path.Combine(CapcutDatasDir, "Transitions");
 string EffectsDir = Path.Combine(CapcutDatasDir, "Effects");
+string TextsDir = Path.Combine(CapcutDatasDir, "Texts");
 
 Directory.CreateDirectory(AnimationsInsDir);
 Directory.CreateDirectory(AnimationsOutsDir);
 Directory.CreateDirectory(TransitionsDir);
+Directory.CreateDirectory(EffectsDir);
+Directory.CreateDirectory(TextsDir);
+
 
 #if DEBUG
 await RunAsync(Path.Combine(AppContext.BaseDirectory, "draft_content.json"));
@@ -35,7 +39,7 @@ Option<string> o_filePath = new("--draft_content")
             string? value = result.GetValueOrDefault<string>();
             if (!File.Exists(value))
             {
-                result.AddError("draft_content file not exist");
+                result.AddError($"draft_content file not exist: '{value}'");
                 return;
             }
         }
@@ -198,5 +202,19 @@ async Task RunAsync(string draftContentFilePath)
                 }
             }
         }
+
+        //var texts = materials["texts"];
+        //if (texts is not null && (texts?.Type) == JTokenType.Array)
+        //{
+        //    foreach (var text in texts)
+        //    {
+        //        int count = Directory.GetFiles(TextsDir).Length;
+        //        string fileName = $"{count:000}.json";
+        //        string jsonFilePath = Path.Combine(TextsDir, fileName);
+        //        Console.WriteLine($"Write text: {fileName}");
+        //        string json = JsonConvert.SerializeObject(text, Formatting.Indented);
+        //        await File.WriteAllTextAsync(jsonFilePath, json);
+        //    }
+        //}
     }
 }
