@@ -2,7 +2,7 @@
   "add_type": 0,
   "alignment": 1,
   "background_alpha": 1.0,
-  "background_color": "",
+  "background_color": "#000000",
   "background_fill": "",
   "background_height": 0.14,
   "background_horizontal_offset": 0.0,
@@ -13,7 +13,7 @@
   "base_content": "",
   "bold_width": 0.0,
   "border_alpha": 1.0,
-  "border_color": "",
+  "border_color": "#ffffff",
   "border_width": 0.08,
   "caption_template_info": {
     "category_id": "",
@@ -27,11 +27,11 @@
     "source_platform": 0,
     "third_resource_id": ""
   },
-  "check_flag": 7,
+  "check_flag": 47,
   "combo_info": {
     "text_templates": []
   },
-  "content": "{\"text\":\"Xin chao cac ban\",\"styles\":[{\"fill\":{\"content\":{\"texture\":{\"range\":1,\"path\":\"%userprofile%/AppData/Local/CapCut/User Data/Cache/effect/7584752603188219152/fe7ee28029f346ab45c8c81ac647e640/local_665F6E6E.png\"},\"render_type\":\"texture\"}},\"font\":{\"path\":\"%userprofile%/AppData/Local/CapCut/Apps/7.7.0.3143/Resources/Font/SystemFont/en.ttf\",\"id\":\"\"},\"size\":15,\"effectStyle\":{\"path\":\"%userprofile%/AppData/Local/CapCut/User Data/Cache/effect/7584752603188219152/fe7ee28029f346ab45c8c81ac647e640\",\"id\":\"7584752603188219152\"},\"range\":[0,16]}]}",
+  "content": "{\"styles\":[{\"fill\":{\"alpha\":1.0,\"content\":{\"render_type\":\"solid\",\"solid\":{\"alpha\":1.0,\"color\":[1.0,1.0,1.0]}}},\"font\":{\"id\":\"\",\"path\":\"%userprofile%/AppData/Local/CapCut/Apps/7.7.0.3143/Resources/Font/SystemFont/en.ttf\"},\"range\":[0,12],\"size\":15.0,\"useLetterColor\":true}],\"text\":\"Default text\"}",
   "current_words": {
     "end_time": [],
     "start_time": [],
@@ -58,7 +58,7 @@
   "global_alpha": 1.0,
   "group_id": "",
   "has_shadow": false,
-  "id": "09467D34-4B0A-443d-B851-0E86CD2FE1D4",
+  "id": "9F2BD14F-03CC-4c6b-8EC8-0D2280179581",
   "initial_scale": 1.0,
   "inner_padding": -1.0,
   "is_batch_replace": false,
@@ -66,7 +66,7 @@
   "is_rich_text": false,
   "is_words_linear": false,
   "italic_degree": 0,
-  "ktv_color": "#0022FFFF",
+  "ktv_color": "",
   "language": "",
   "layer_weight": 1,
   "letter_spacing": 0.0,
@@ -104,7 +104,7 @@
   "relevance_segment": [],
   "shadow_alpha": 0.9,
   "shadow_angle": -45.0,
-  "shadow_color": "",
+  "shadow_color": "#000000",
   "shadow_distance": 5.0,
   "shadow_point": {
     "x": 0.6363961030678928,
@@ -122,7 +122,7 @@
   "subtitle_keywords_config": null,
   "subtitle_template_original_fontsize": 0.0,
   "text_alpha": 1.0,
-  "text_color": "#FFFFFF",
+  "text_color": "#ffffff",
   "text_curve": null,
   "text_exceeds_path_process_type": 0,
   "text_loop_on_path": false,
