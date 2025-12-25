@@ -13,6 +13,8 @@ namespace TqkLibrary.CapcutAuto.Models.Tracks.Segments
         }
 
 
+        [JsonProperty("clip")]
+        public SegmentClip Clip { get; init; } = new();
 
 
 

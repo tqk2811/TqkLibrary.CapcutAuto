@@ -12,6 +12,9 @@ namespace TqkLibrary.CapcutAuto.Models.Tracks.Segments
             return MaterialText;
         }
 
+        [JsonProperty("clip")]
+        public SegmentClip Clip { get; init; } = new();
+
 
 
 
