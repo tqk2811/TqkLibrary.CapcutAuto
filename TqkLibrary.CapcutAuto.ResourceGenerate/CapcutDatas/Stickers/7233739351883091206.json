@@ -1,0 +1,87 @@
+{
+  "aigc_type": "none",
+  "background_alpha": 1.0,
+  "background_color": "",
+  "border_color": "",
+  "border_line_style": 0,
+  "border_width": 0.0,
+  "category_id": "123456",
+  "category_name": "Stickers",
+  "check_flag": 1,
+  "combo_info": {
+    "text_templates": []
+  },
+  "cycle_setting": true,
+  "formula_id": "",
+  "global_alpha": 1.0,
+  "has_shadow": false,
+  "icon_url": "https://p16-heycan-image-sign-useast5.capcutcdn-us.com/tos-useast5-i-fhsjxsyzit-tx/6f65eccdcda147c9ada192cdc8a0cc23~tplv-fhsjxsyzit-image.image?x-expires=1798533694&x-signature=5%2B6X6rxOegfxd80bvMJAEeVadok%3D",
+  "id": "641A6339-FC9F-419e-9841-22F1A4D8E1BA",
+  "multi_language_current": "none",
+  "name": "259",
+  "original_size": [],
+  "path": "%userprofile%/AppData/Local/CapCut/User Data/Cache/artistEffect/7233739351883091206/faba100fc51e0a7d224050a384f81e4f",
+  "platform": "all",
+  "preview_cover_url": "https://p16-heycan-image-sign-useast5.capcutcdn-us.com/tos-useast5-i-fhsjxsyzit-tx/6f65eccdcda147c9ada192cdc8a0cc23~tplv-fhsjxsyzit-image.image?x-expires=1798533694&x-signature=5%2B6X6rxOegfxd80bvMJAEeVadok%3D",
+  "radius": {
+    "bottom_left": 0.0,
+    "bottom_right": 0.0,
+    "top_left": 0.0,
+    "top_right": 0.0
+  },
+  "request_id": "20251229084047172018000077944824E",
+  "resource_id": "7233739351883091206",
+  "sequence_type": false,
+  "shadow_alpha": 0.8,
+  "shadow_angle": 0.0,
+  "shadow_color": "",
+  "shadow_distance": 0.0,
+  "shadow_point": {
+    "x": 0.0,
+    "y": 0.0
+  },
+  "shadow_smoothing": 0.0,
+  "shape_fill_render_style": {
+    "alpha": 1.0,
+    "color": {
+      "gradient": {
+        "alpha": [],
+        "angle": 90.0,
+        "color": [],
+        "mode": "all",
+        "percent": [],
+        "style": "linear"
+      },
+      "render_type": "solid",
+      "solid": {
+        "alpha": 1.0,
+        "color": "#FFFFFF"
+      },
+      "texture": {
+        "alpha": 1.0,
+        "angle": 90.0,
+        "blend": "no",
+        "effect_id": "",
+        "fill": "tile",
+        "flip": [],
+        "path": "",
+        "range": 4,
+        "resource_id": "",
+        "scale": 1.0
+      }
+    }
+  },
+  "shape_fill_use_flower_color": false,
+  "shape_param": {
+    "custom_points": [],
+    "roundness": [],
+    "shape_size": [],
+    "shape_type": 0
+  },
+  "source_platform": 1,
+  "sticker_id": "7233739351883091206",
+  "sub_type": 0,
+  "team_id": "",
+  "type": "sticker",
+  "unicode": ""
+}
