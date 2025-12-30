@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Resources
+namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Animations
 {
     public sealed class CapcutAnimationVideo : CapcutAnimation
     {

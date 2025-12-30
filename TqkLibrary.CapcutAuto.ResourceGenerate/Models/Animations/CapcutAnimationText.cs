@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Threading.Tasks;
 
-namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Resources
+namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Animations
 {
     public sealed class CapcutAnimationText : CapcutAnimation
     {

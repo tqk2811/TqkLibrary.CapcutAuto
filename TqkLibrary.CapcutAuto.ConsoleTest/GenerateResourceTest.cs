@@ -2,7 +2,7 @@
 using TqkLibrary.CapcutAuto.ResourceGenerate.Helpers;
 using TqkLibrary.CapcutAuto.ResourceGenerate.Models;
 using TqkLibrary.CapcutAuto.ResourceGenerate.Models.Materials;
-using TqkLibrary.CapcutAuto.ResourceGenerate.Models.Resources;
+using TqkLibrary.CapcutAuto.ResourceGenerate.Models.Animations;
 using TqkLibrary.CapcutAuto.ResourceGenerate.Models.Tracks;
 using TqkLibrary.CapcutAuto.ResourceGenerate.Models.Tracks.Segments;
 

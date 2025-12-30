@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Collections;
 using TqkLibrary.CapcutAuto.ResourceGenerate.Enums;
-using TqkLibrary.CapcutAuto.ResourceGenerate.Models.Resources;
+using TqkLibrary.CapcutAuto.ResourceGenerate.Models.Animations;
 
 namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Materials
 {

@@ -2,7 +2,7 @@
 using TqkLibrary.CapcutAuto.ResourceGenerate.Enums;
 using TqkLibrary.CapcutAuto.ResourceGenerate.JsonConverters;
 
-namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Resources
+namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Animations
 {
     public abstract class CapcutAnimation : BaseCapcut
     {
