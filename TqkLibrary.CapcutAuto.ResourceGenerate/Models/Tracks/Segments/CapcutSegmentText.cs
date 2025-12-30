@@ -19,7 +19,7 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Tracks.Segments
 
 
         [JsonIgnore]
-        public CapcutMaterialAnimation MaterialAnimation { get; set; } = new();
+        public CapcutMaterialAnimationText MaterialAnimation { get; set; } = new();
 
         [JsonIgnore]
         public CapcutMaterialEffect? MaterialEffect { get; set; }
