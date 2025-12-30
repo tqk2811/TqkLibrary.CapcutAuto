@@ -34,7 +34,7 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Tracks.Segments
         public CapcutMaterialCanvasColor MaterialCanvasColor { get; set; } = new();
 
         [JsonIgnore]
-        public CapcutMaterialAnimation MaterialAnimation { get; set; } = new();
+        public CapcutMaterialAnimationVideo MaterialAnimation { get; set; } = new();
 
         [JsonIgnore]
         public CapcutMaterialSoundChannelMapping MaterialSoundChannelMapping { get; set; } = new();
