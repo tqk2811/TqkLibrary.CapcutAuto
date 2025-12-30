@@ -9,6 +9,7 @@
         sticker_animation,
         text_effect,
         extract_music,
+        music,
         placeholder_info,
         none,
         vocal_separation,

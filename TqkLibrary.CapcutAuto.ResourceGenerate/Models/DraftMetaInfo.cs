@@ -135,7 +135,7 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models
             {
                 Metetype = MeteType.music;
             }
-            public CapcutMaterialAudio CreateMaterial() => CapcutMaterialAudio.Create(this);
+            public CapcutMaterialAudioExtractMusic CreateMaterial() => CapcutMaterialAudioExtractMusic.Create(this);
         }
         public class RoughcutTimeRange
         {
