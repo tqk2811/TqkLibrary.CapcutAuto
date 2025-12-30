@@ -6,14 +6,16 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<Configurations>Debug;Release;RemoteDebug</Configurations>
+		<Platforms>AnyCPU;x64</Platforms>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="$(Configuration) == 'RemoteDebug'">
-		<BaseOutputPath>\\DESKTOP-2COFU4V\Csharp\TqkLibrary.CapcutAuto.ConsoleTest</BaseOutputPath>
+		<BaseOutputPath>\\TestEmulator\Csharp\TqkLibrary.CapcutAuto.ConsoleTest</BaseOutputPath>
 	</PropertyGroup>
 
 	<ItemGroup>
 	  <ProjectReference Include="..\TqkLibrary.CapcutAuto.ResourceGenerate\TqkLibrary.CapcutAuto.ResourceGenerate.csproj" />
+	  <ProjectReference Include="..\TqkLibrary.CapcutAuto\TqkLibrary.CapcutAuto.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

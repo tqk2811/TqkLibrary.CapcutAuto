@@ -4,17 +4,19 @@
 		<OutputType>Exe</OutputType>
 		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
+		<LangVersion>14</LangVersion>
 		<Nullable>enable</Nullable>
 		<Configurations>Debug;Release;RemoteDebug</Configurations>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="$(Configuration) == 'RemoteDebug'">
-		<BaseOutputPath>\\DESKTOP-2COFU4V\Csharp\TqkLibrary.CapcutAuto.ResourceTracker</BaseOutputPath>
+		<BaseOutputPath>\\TestEmulator\Csharp\TqkLibrary.CapcutAuto.ResourceTracker</BaseOutputPath>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
 		<PackageReference Include="System.CommandLine" Version="2.0.1" />
+		<PackageReference Include="TqkLibrary.Linq" Version="1.0.0-build20251205144537" />
 	</ItemGroup>
 
 </Project>
