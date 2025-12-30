@@ -1,10 +1,14 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 using System.CommandLine;
+using System.Text;
 using System.Timers;
 using System.Transactions;
 using System.Xml.Linq;
 using TqkLibrary.Linq;
+
+Console.OutputEncoding = Encoding.UTF8;
 
 string test = JsonConvert.SerializeObject(Guid.NewGuid());
 
@@ -41,13 +45,22 @@ string TransitionsDir = Path.Combine(CapcutDatasDir, "Transitions");
 Directory.CreateDirectory(TransitionsDir);
 
 string EffectsDir = Path.Combine(CapcutDatasDir, "Effects");
-Directory.CreateDirectory(EffectsDir);
+
+string TextEffectsDir = Path.Combine(EffectsDir, "Effects");
+Directory.CreateDirectory(TextEffectsDir);
+
+string TextShapesDir = Path.Combine(EffectsDir, "TextShapes");
+Directory.CreateDirectory(TextShapesDir);
 
 string StickersDir = Path.Combine(CapcutDatasDir, "Stickers");
 Directory.CreateDirectory(StickersDir);
 
 string TextsDir = Path.Combine(CapcutDatasDir, "Texts");
 Directory.CreateDirectory(TextsDir);
+
+string AudiosDir = Path.Combine(CapcutDatasDir, "Audios");
+Directory.CreateDirectory(AudiosDir);
+
 
 
 #if DEBUG
@@ -153,7 +166,7 @@ async Task RunAsync(string draftContentFilePath)
     List<string> textMaterialIds = new();
     List<string> stickerMaterialIds = new();
     var tracks = data["tracks"];
-    if (tracks is not null && (tracks?.Type) == JTokenType.Array)
+    if (tracks?.Type == JTokenType.Array)
     {
         foreach (var track in tracks)
         {
@@ -171,15 +184,18 @@ async Task RunAsync(string draftContentFilePath)
             if (materialIds is null)
                 continue;
 
-            var segments = data["segments"];
-            if (segments is not null && (segments?.Type) == JTokenType.Array)
+            var segments = track["segments"];
+            if (segments?.Type == JTokenType.Array)
             {
                 foreach (var segment in segments)
                 {
-                    List<string>? extra_material_refs = segment.Value<List<string>>();
-                    if (extra_material_refs is not null && extra_material_refs.Any())
+                    var extra_material_refs = segment["extra_material_refs"];
+                    if (extra_material_refs?.Type == JTokenType.Array)
                     {
-                        materialIds.AddRange(extra_material_refs);
+                        foreach (var extra_material_ref in extra_material_refs)
+                        {
+                            materialIds.Add(extra_material_ref.ToString());
+                        }
                     }
                 }
             }
@@ -190,7 +206,7 @@ async Task RunAsync(string draftContentFilePath)
     if (materials is not null)
     {
         var material_animations = materials["material_animations"];
-        if (material_animations is not null && (material_animations?.Type) == JTokenType.Array)
+        if (material_animations?.Type == JTokenType.Array)
         {
             foreach (var material_animation in material_animations)
             {
@@ -255,7 +271,7 @@ async Task RunAsync(string draftContentFilePath)
         }
 
         var transitions = materials["transitions"];
-        if (transitions is not null && (transitions?.Type) == JTokenType.Array)
+        if (transitions?.Type == JTokenType.Array)
         {
             foreach (var transition in transitions)
             {
@@ -276,20 +292,33 @@ async Task RunAsync(string draftContentFilePath)
         }
 
         var effects = materials["effects"];
-        if (effects is not null && (effects?.Type) == JTokenType.Array)
+        if (effects?.Type == JTokenType.Array)
         {
             foreach (var effect in effects)
             {
+                string? type = effect.Value<string>("type");
                 string? name = effect.Value<string>("name");
                 string? resource_id = effect.Value<string>("resource_id");
                 if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(resource_id))
                     continue;
 
+                string? dir = type switch
+                {
+                    "text_effect" => TextEffectsDir,
+                    "text_shape" => TextShapesDir,
+                    _ => null,
+                };
+                if (string.IsNullOrWhiteSpace(dir))
+                {
+                    Console.WriteLine($"Not support materials effects type: {type}");
+                    continue;
+                }
+
                 string fileName = $"{resource_id}.json";
-                string jsonFilePath = Path.Combine(EffectsDir, fileName);
+                string jsonFilePath = Path.Combine(dir, fileName);
                 if (!File.Exists(jsonFilePath))
                 {
-                    Console.WriteLine($"Write effect: {name} ({fileName})");
+                    Console.WriteLine($"Write effect {type}: {name} ({fileName})");
                     string json = JsonConvert.SerializeObject(effect, Formatting.Indented);
                     await File.WriteAllTextAsync(jsonFilePath, json);
                 }
@@ -297,7 +326,7 @@ async Task RunAsync(string draftContentFilePath)
         }
 
         var stickers = materials["stickers"];
-        if (stickers is not null && (stickers?.Type) == JTokenType.Array)
+        if (stickers?.Type == JTokenType.Array)
         {
             foreach (var sticker in stickers)
             {
@@ -313,6 +342,32 @@ async Task RunAsync(string draftContentFilePath)
                     Console.WriteLine($"Write sticker: {name} ({fileName})");
                     string json = JsonConvert.SerializeObject(sticker, Formatting.Indented);
                     await File.WriteAllTextAsync(jsonFilePath, json);
+                }
+            }
+        }
+
+        var audios = materials["audios"];
+        if (audios?.Type == JTokenType.Array)
+        {
+            foreach (var audio in audios)
+            {
+                string? type = audio.Value<string>("type");
+                string? name = audio.Value<string>("name");
+                string? music_id = audio.Value<string>("music_id");
+                if (string.IsNullOrWhiteSpace(type)
+                    || string.IsNullOrWhiteSpace(music_id)
+                    )
+                    continue;
+                if ("music".Equals(type))
+                {
+                    string fileName = $"{music_id}.json";
+                    string jsonFilePath = Path.Combine(AudiosDir, fileName);
+                    if (!File.Exists(jsonFilePath))
+                    {
+                        Console.WriteLine($"Write audio: {name} ({fileName})");
+                        string json = JsonConvert.SerializeObject(audio, Formatting.Indented);
+                        await File.WriteAllTextAsync(jsonFilePath, json);
+                    }
                 }
             }
         }
