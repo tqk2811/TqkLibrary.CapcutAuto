@@ -4,15 +4,8 @@ using TqkLibrary.CapcutAuto.ResourceGenerate.JsonConverters;
 
 namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Resources
 {
-    public class CapcutAnimation : BaseCapcut
+    public abstract class CapcutAnimation : BaseCapcut
     {
-        [JsonConstructor]
-        private CapcutAnimation()
-        {
-
-        }
-
-
         [JsonProperty("category_id")]
         public required string CategoryId { get; init; }
 
@@ -63,11 +56,5 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Resources
 
         [JsonProperty("duration")]
         public required TimeSpan Duration { get; set; }
-
-
-        public static CapcutAnimation Parse(string json_text)
-        {
-            return JsonConvert.DeserializeObject<CapcutAnimation>(json_text, Singleton.JsonSerializerSettings)!;
-        }
     }
 }
