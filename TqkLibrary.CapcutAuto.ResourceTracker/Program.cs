@@ -4,23 +4,49 @@ using System.CommandLine;
 using System.Timers;
 using System.Transactions;
 using System.Xml.Linq;
+using TqkLibrary.Linq;
 
 string test = JsonConvert.SerializeObject(Guid.NewGuid());
 
 string CapcutDatasDir = Path.Combine(AppContext.BaseDirectory, "CapcutDatas");
 
 string AnimationsDir = Path.Combine(CapcutDatasDir, "Animations");
-string AnimationsInsDir = Path.Combine(AnimationsDir, "Ins");
-string AnimationsOutsDir = Path.Combine(AnimationsDir, "Outs");
+IEnumerable<IEnumerable<string>> ItemsInAnimationsDir = new IEnumerable<string>[]
+{
+    new string[]
+    {
+        "Texts",
+        "Videos",
+        "Stickers"
+    },
+    new string[]
+    {
+        "Ins",
+        "Outs",
+        "Loops"
+    }
+};
+foreach (var item in ItemsInAnimationsDir.TwoDimensionCombinations())
+{
+    List<string> names = new List<string>()
+    {
+        AnimationsDir,
+    };
+    names.AddRange(item);
+    string dir = Path.Combine(names.ToArray());
+    Directory.CreateDirectory(dir);
+}
 
 string TransitionsDir = Path.Combine(CapcutDatasDir, "Transitions");
-string EffectsDir = Path.Combine(CapcutDatasDir, "Effects");
-string TextsDir = Path.Combine(CapcutDatasDir, "Texts");
-
-Directory.CreateDirectory(AnimationsInsDir);
-Directory.CreateDirectory(AnimationsOutsDir);
 Directory.CreateDirectory(TransitionsDir);
+
+string EffectsDir = Path.Combine(CapcutDatasDir, "Effects");
 Directory.CreateDirectory(EffectsDir);
+
+string StickersDir = Path.Combine(CapcutDatasDir, "Stickers");
+Directory.CreateDirectory(StickersDir);
+
+string TextsDir = Path.Combine(CapcutDatasDir, "Texts");
 Directory.CreateDirectory(TextsDir);
 
 
@@ -122,6 +148,44 @@ async Task RunAsync(string draftContentFilePath)
 {
     string json_text = await File.ReadAllTextAsync(draftContentFilePath);
     JObject data = (JObject)JsonConvert.DeserializeObject(json_text)!;
+
+    List<string> videoMaterialIds = new();
+    List<string> textMaterialIds = new();
+    List<string> stickerMaterialIds = new();
+    var tracks = data["tracks"];
+    if (tracks is not null && (tracks?.Type) == JTokenType.Array)
+    {
+        foreach (var track in tracks)
+        {
+            string? type = track.Value<string>("type");
+            if (string.IsNullOrWhiteSpace(type))
+                continue;
+
+            List<string>? materialIds = type switch
+            {
+                "video" => videoMaterialIds,
+                "text" => textMaterialIds,
+                "sticker" => stickerMaterialIds,
+                _ => null
+            };
+            if (materialIds is null)
+                continue;
+
+            var segments = data["segments"];
+            if (segments is not null && (segments?.Type) == JTokenType.Array)
+            {
+                foreach (var segment in segments)
+                {
+                    List<string>? extra_material_refs = segment.Value<List<string>>();
+                    if (extra_material_refs is not null && extra_material_refs.Any())
+                    {
+                        materialIds.AddRange(extra_material_refs);
+                    }
+                }
+            }
+        }
+    }
+
     var materials = data["materials"];
     if (materials is not null)
     {
@@ -130,9 +194,32 @@ async Task RunAsync(string draftContentFilePath)
         {
             foreach (var material_animation in material_animations)
             {
+                string? id = material_animation.Value<string>("id");
                 var animations = material_animation["animations"];
-                if (animations is null || animations?.Type != JTokenType.Array)
+                if (string.IsNullOrWhiteSpace(id)
+                    || animations?.Type != JTokenType.Array
+                    )
                     continue;
+
+                string dirName;
+                if (videoMaterialIds.Contains(id, StringComparer.OrdinalIgnoreCase))
+                {
+                    dirName = "Videos";
+                }
+                else if (textMaterialIds.Contains(id, StringComparer.OrdinalIgnoreCase))
+                {
+                    dirName = "Texts";
+                }
+                else if (stickerMaterialIds.Contains(id, StringComparer.OrdinalIgnoreCase))
+                {
+                    dirName = "Stickers";
+                }
+                else
+                {
+                    Console.WriteLine($"material_animation: {id} not link to any segments");
+                    continue;
+                }
+
                 foreach (var animation in animations)
                 {
                     string? name = animation.Value<string>("name");
@@ -141,19 +228,25 @@ async Task RunAsync(string draftContentFilePath)
                         continue;
 
                     string? type = animation.Value<string>("type");
-                    string fileName = $"{resource_id}.json";
-                    string? jsonFilePath = type switch
+                    string? childDirName = type switch
                     {
-                        "in" => Path.Combine(AnimationsInsDir, fileName),
-                        "out" => Path.Combine(AnimationsOutsDir, fileName),
+                        "in" => "Ins",
+                        "out" => "Outs",
+                        "loop" => "Loops",
                         _ => null
                     };
-                    if (string.IsNullOrWhiteSpace(jsonFilePath))
+                    if (string.IsNullOrWhiteSpace(childDirName))
+                    {
+                        Console.WriteLine($"Not support animation type: {type}");
                         continue;
+                    }
+
+                    string fileName = $"{resource_id}.json";
+                    string jsonFilePath = Path.Combine(AnimationsDir, dirName, childDirName, fileName);
 
                     if (!File.Exists(jsonFilePath))
                     {
-                        Console.WriteLine($"Write animation {type}: {name} ({fileName})");
+                        Console.WriteLine($"Write animation {dirName} {type}: {name} ({fileName})");
                         string json = JsonConvert.SerializeObject(animation, Formatting.Indented);
                         await File.WriteAllTextAsync(jsonFilePath, json);
                     }
@@ -196,13 +289,33 @@ async Task RunAsync(string draftContentFilePath)
                 string jsonFilePath = Path.Combine(EffectsDir, fileName);
                 if (!File.Exists(jsonFilePath))
                 {
-                    Console.WriteLine($"Write transition: {name} ({fileName})");
+                    Console.WriteLine($"Write effect: {name} ({fileName})");
                     string json = JsonConvert.SerializeObject(effect, Formatting.Indented);
                     await File.WriteAllTextAsync(jsonFilePath, json);
                 }
             }
         }
 
+        var stickers = materials["stickers"];
+        if (stickers is not null && (stickers?.Type) == JTokenType.Array)
+        {
+            foreach (var sticker in stickers)
+            {
+                string? name = sticker.Value<string>("name");
+                string? resource_id = sticker.Value<string>("resource_id");
+                if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(resource_id))
+                    continue;
+
+                string fileName = $"{resource_id}.json";
+                string jsonFilePath = Path.Combine(StickersDir, fileName);
+                if (!File.Exists(jsonFilePath))
+                {
+                    Console.WriteLine($"Write sticker: {name} ({fileName})");
+                    string json = JsonConvert.SerializeObject(sticker, Formatting.Indented);
+                    await File.WriteAllTextAsync(jsonFilePath, json);
+                }
+            }
+        }
         //var texts = materials["texts"];
         //if (texts is not null && (texts?.Type) == JTokenType.Array)
         //{
