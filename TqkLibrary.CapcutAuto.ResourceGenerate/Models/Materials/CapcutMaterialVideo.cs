@@ -35,29 +35,6 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Materials
         [JsonProperty("local_material_id")]
         public required Guid LocalMaterialId { get; init; }
 
-        //public static async Task<CapcutMaterialVideo> CreateAsync(string videoFilePath, CancellationToken cancellationToken = default)
-        //{
-        //    FileInfo fileInfo = new(videoFilePath);
-        //    if (!fileInfo.Exists)
-        //        throw new FileNotFoundException(videoFilePath);
-        //    IMediaAnalysis mediaAnalysis = await FFProbe.AnalyseAsync(videoFilePath, cancellationToken: cancellationToken);
-        //    if (mediaAnalysis.PrimaryVideoStream is null)
-        //        throw new InvalidOperationException($"File had no VideoStream");
-
-        //    string json = Extensions.GetEmbeddedResource("Materials.Video.json");
-        //    JObject jObject = JObject.Parse(json);
-        //    return new CapcutMaterialVideo(jObject)
-        //    {
-        //        Path = fileInfo.FullName,
-        //        Type = MaterialType.video,
-        //        MaterialName = fileInfo.Name,
-        //        Duration = mediaAnalysis.Duration,
-        //        HasAudio = mediaAnalysis.PrimaryAudioStream is not null,
-        //        Width = mediaAnalysis.PrimaryVideoStream!.Width,
-        //        Height = mediaAnalysis.PrimaryVideoStream!.Height,
-        //    };
-        //}
-
         internal static CapcutMaterialVideo Create(DraftMetaInfo.DraftMaterialValueVideo draftMaterialValueVideo)
         {
             string json = Extensions.GetEmbeddedResourceString("Materials.Video.json");
