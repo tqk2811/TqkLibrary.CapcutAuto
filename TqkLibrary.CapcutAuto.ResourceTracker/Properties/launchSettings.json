@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "TqkLibrary.CapcutAuto.ResourceTracker": {
+    "Debug": {
       "commandName": "Project"
     },
     "RemoteDebug": {
