@@ -13,5 +13,18 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Resources
         {
             return JsonConvert.DeserializeObject<CapcutAnimationVideo>(json_text, Singleton.JsonSerializerSettings)!;
         }
+        public static async Task<IReadOnlyList<CapcutAnimationVideo>> FromDirAsync(string dir)
+        {
+            List<CapcutAnimationVideo> capcutAnimations = new List<CapcutAnimationVideo>();
+            if (Directory.Exists(dir))
+            {
+                foreach (var file in Directory.GetFiles(dir, "*.json"))
+                {
+                    string json_text = await File.ReadAllTextAsync(file);
+                    capcutAnimations.Add(Parse(json_text));
+                }
+            }
+            return capcutAnimations;
+        }
     }
 }
