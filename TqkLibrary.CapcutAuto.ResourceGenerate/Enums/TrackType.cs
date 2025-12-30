@@ -5,5 +5,6 @@
         video,
         text,
         audio,
+        sticker,
     }
 }
