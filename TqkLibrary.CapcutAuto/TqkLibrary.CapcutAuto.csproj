@@ -1,10 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<Import Project="..\ProjectBuildProperties.targets" />
-
+	<PropertyGroup>
+		<TargetFrameworks>net8.0-windows10.0.19041.0</TargetFrameworks>
+	</PropertyGroup>
+	
 	<ItemGroup>
-		<PackageReference Include="FFMpegCore" Version="5.4.0" />
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+		<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.264">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="TqkLibrary.Automation.Images" Version="1.0.0-build20250707172050" />
+		<PackageReference Include="TqkLibrary.WinApi" Version="1.0.0-build20250616161206" />
+		<PackageReference Include="TqkLibrary.WindowCapture" Version="1.0.2" />
 	</ItemGroup>
 
 
