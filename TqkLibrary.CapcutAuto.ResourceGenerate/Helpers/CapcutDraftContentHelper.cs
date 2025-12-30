@@ -4,6 +4,7 @@ using Newtonsoft.Json.Linq;
 using System.Reflection;
 using TqkLibrary.CapcutAuto.ResourceGenerate.JsonConverters;
 using TqkLibrary.CapcutAuto.ResourceGenerate.Models;
+using TqkLibrary.CapcutAuto.ResourceGenerate.Models.Materials;
 using TqkLibrary.CapcutAuto.ResourceGenerate.Models.Tracks;
 using TqkLibrary.CapcutAuto.ResourceGenerate.Models.Tracks.Segments;
 
@@ -80,7 +81,7 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Helpers
             _jobject["materials"]!["speeds"] = JArray.FromObject(speeds.ToArray(), _jsonSerializer);
 
 
-            var materials_t_animations = textSegments.Select(x => x.MaterialAnimation).Where(x => x is not null).ToArray();
+            CapcutMaterialAnimation[] materials_t_animations = textSegments.Select(x => x.MaterialAnimation).Where(x => x is not null).ToArray();
             var materials_v_animations = videoSegments.Select(x => x.MaterialAnimation).Where(x => x is not null).ToArray();
             var material_animations = materials_t_animations.Concat(materials_v_animations).ToArray();
             _jobject["materials"]!["material_animations"] = JArray.FromObject(material_animations, _jsonSerializer);//text animation
