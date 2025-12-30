@@ -114,16 +114,18 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Helpers
         }
 
 
-        public async Task WriteProjectAsync(CancellationToken cancellationToken = default)
+        public async Task CleanupProjectAsync(CancellationToken cancellationToken = default)
         {
-            //update _rootMetaInfo and _draftMetaInfo from DraftContent
-
-
             if (Directory.Exists(_draftMetaInfo.DraftFolderPath))
             {
                 await Task.Factory.StartNew(() => Directory.Delete(_draftMetaInfo.DraftFolderPath, true), TaskCreationOptions.LongRunning);
             }
             Directory.CreateDirectory(_draftMetaInfo.DraftFolderPath);
+        }
+
+        public async Task WriteProjectAsync(CancellationToken cancellationToken = default)
+        {
+            //update _rootMetaInfo and _draftMetaInfo from DraftContent
 
             using (Stream cover_stream = Extensions.GetEmbeddedResourceStream("cover.jpg"))
             {
