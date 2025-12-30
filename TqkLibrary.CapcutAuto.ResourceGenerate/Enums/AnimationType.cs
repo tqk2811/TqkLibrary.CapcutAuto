@@ -3,6 +3,7 @@
     public enum AnimationType
     {
         @in,
-        @out
+        @out,
+        loop,
     }
 }
