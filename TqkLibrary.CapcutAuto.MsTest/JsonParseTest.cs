@@ -18,14 +18,14 @@ namespace TqkLibrary.CapcutAuto.MsTest
 
 
         [TestMethod]
-        public async Task Test_CapcutMaterialEffect()
+        public async Task Test_CapcutMaterialEffectTextEffect()
         {
             var files = Directory.GetFiles(".\\CapcutDatas\\Effects");
 
             foreach (var file in files)
             {
                 string json = await File.ReadAllTextAsync(file);
-                CapcutMaterialEffect capcutMaterialText = CapcutMaterialEffect.Parse(json);
+                CapcutMaterialEffectTextEffect capcutMaterialText = CapcutMaterialEffectTextEffect.Parse(json);
                 string json_out = capcutMaterialText.GetJsonString();
             }
         }

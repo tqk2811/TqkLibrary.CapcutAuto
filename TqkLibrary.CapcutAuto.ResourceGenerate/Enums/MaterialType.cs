@@ -15,5 +15,6 @@
         vocal_separation,
         beats,
         canvas_color,
+        text_shape,
     }
 }

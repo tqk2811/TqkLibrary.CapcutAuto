@@ -22,14 +22,31 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Tracks.Segments
         public CapcutMaterialAnimationText MaterialAnimation { get; set; } = new();
 
         [JsonIgnore]
-        public CapcutMaterialEffect? MaterialEffect { get; set; }
+        public CapcutMaterialEffectTextEffect? MaterialEffectTextEffect { get; set; }
+
+        [JsonIgnore]
+        public CapcutMaterialEffectTextShape? MaterialEffectTextShape { get; set; }
+
+        [JsonIgnore]
+        public IEnumerable<CapcutMaterialEffect> CapcutMaterialEffects
+        {
+            get
+            {
+                if (MaterialEffectTextEffect is not null)
+                    yield return MaterialEffectTextEffect;
+                if (MaterialEffectTextShape is not null)
+                    yield return MaterialEffectTextShape;
+            }
+        }
+
 
         protected override IEnumerable<CapcutId> GetExtraMaterialRefs()
         {
             CapcutId?[] capcutIds = new CapcutId?[]
             {
                  MaterialAnimation,//animation
-                 MaterialEffect,//effect
+                 MaterialEffectTextEffect,//effect
+                 MaterialEffectTextShape,//effect
             };
             foreach (CapcutId capcutId in capcutIds.Where(x => x is not null)!)
             {

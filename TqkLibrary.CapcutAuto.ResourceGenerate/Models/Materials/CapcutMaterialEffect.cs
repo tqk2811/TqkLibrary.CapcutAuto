@@ -5,12 +5,11 @@ using TqkLibrary.CapcutAuto.ResourceGenerate.JsonConverters;
 
 namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Materials
 {
-    public class CapcutMaterialEffect : CapcutMaterial
+    public abstract class CapcutMaterialEffect : CapcutMaterial
     {
-        [JsonConstructor]
-        private CapcutMaterialEffect(JObject jObject) : base(jObject)//parse from json
+        protected CapcutMaterialEffect(MaterialType materialType, JObject jObject) : base(jObject)//parse from json
         {
-            Type = MaterialType.text_effect;
+            Type = materialType;
         }
 
 
@@ -18,9 +17,5 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Materials
         [JsonConverter(typeof(CapcutPathConverter))]
         public required string Path { get; init; }
 
-        public static CapcutMaterialEffect Parse(string json)
-        {
-            return JsonConvert.DeserializeObject<CapcutMaterialEffect>(json, Singleton.JsonSerializerSettings)!;
-        }
     }
 }
