@@ -5,7 +5,11 @@ using TqkLibrary.CapcutAuto.ResourceGenerate.Models.Resources;
 
 namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Materials
 {
-    public abstract class CapcutMaterialAnimation<T> : CapcutMaterial
+    public abstract class CapcutMaterialAnimation : CapcutMaterial
+    {
+
+    }
+    public abstract class CapcutMaterialAnimation<T> : CapcutMaterialAnimation
         where T : CapcutAnimation
     {
         readonly List<T> _animations = new();
