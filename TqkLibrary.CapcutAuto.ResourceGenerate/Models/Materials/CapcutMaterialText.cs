@@ -65,7 +65,7 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Materials
                 public required _Font Font { get; set; }
 
                 [JsonProperty("size")]
-                public required int Size { get; set; }
+                public required double Size { get; set; }
 
                 [JsonProperty("effectStyle")]
                 public required _EffectStyle EffectStyle { get; set; }
