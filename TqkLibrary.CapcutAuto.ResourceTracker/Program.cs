@@ -46,7 +46,7 @@ Directory.CreateDirectory(TransitionsDir);
 
 string EffectsDir = Path.Combine(CapcutDatasDir, "Effects");
 
-string TextEffectsDir = Path.Combine(EffectsDir, "Effects");
+string TextEffectsDir = Path.Combine(EffectsDir, "TextEffects");
 Directory.CreateDirectory(TextEffectsDir);
 
 string TextShapesDir = Path.Combine(EffectsDir, "TextShapes");
@@ -372,18 +372,18 @@ async Task RunAsync(string draftContentFilePath)
             }
         }
 
-        //var texts = materials["texts"];
-        //if (texts is not null && (texts?.Type) == JTokenType.Array)
-        //{
-        //    foreach (var text in texts)
-        //    {
-        //        int count = Directory.GetFiles(TextsDir).Length;
-        //        string fileName = $"{count:000}.json";
-        //        string jsonFilePath = Path.Combine(TextsDir, fileName);
-        //        Console.WriteLine($"Write text: {fileName}");
-        //        string json = JsonConvert.SerializeObject(text, Formatting.Indented);
-        //        await File.WriteAllTextAsync(jsonFilePath, json);
-        //    }
-        //}
+        var texts = materials["texts"];
+        if (texts is not null && (texts?.Type) == JTokenType.Array)
+        {
+            foreach (var text in texts)
+            {
+                int count = Directory.GetFiles(TextsDir).Length;
+                string fileName = $"{count:000}.json";
+                string jsonFilePath = Path.Combine(TextsDir, fileName);
+                Console.WriteLine($"Write text: {fileName}");
+                string json = JsonConvert.SerializeObject(text, Formatting.Indented);
+                await File.WriteAllTextAsync(jsonFilePath, json);
+            }
+        }
     }
 }
