@@ -9,7 +9,7 @@ namespace TqkLibrary.CapcutAuto
     {
         public static async Task MouseClickAsync(this WindowHelper windowHelper, Point point, CancellationToken cancellationToken = default)
         {
-            Rectangle? area = windowHelper.Area;
+            Rectangle? area = windowHelper.GetArea();
             if (!area.HasValue) throw new Exception();
 
             PInvoke.SetCursorPos(point.X, point.Y);
