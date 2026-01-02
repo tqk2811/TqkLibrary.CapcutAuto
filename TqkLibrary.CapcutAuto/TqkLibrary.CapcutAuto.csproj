@@ -11,8 +11,8 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="TqkLibrary.Automation.Images" Version="1.0.0-build20250707172050" />
-		<PackageReference Include="TqkLibrary.WinApi" Version="1.0.0-build20250616161206" />
-		<PackageReference Include="TqkLibrary.WindowCapture" Version="1.0.2" />
+		<PackageReference Include="TqkLibrary.WinApi" Version="1.0.0-build20251231190704" />
+		<PackageReference Include="TqkLibrary.WindowCapture" Version="1.0.4" />
 	</ItemGroup>
 
 

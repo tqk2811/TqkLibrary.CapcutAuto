@@ -371,6 +371,7 @@ async Task RunAsync(string draftContentFilePath)
                 }
             }
         }
+
         //var texts = materials["texts"];
         //if (texts is not null && (texts?.Type) == JTokenType.Array)
         //{

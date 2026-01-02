@@ -178,6 +178,8 @@ namespace TqkLibrary.CapcutAuto.ConsoleTest
                 },
             });
 
+            await capcutProjectHelper.CleanupProjectAsync();
+
             await capcutProjectHelper.WriteProjectAsync();
 
         }
