@@ -2,6 +2,8 @@
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.CommandLine;
+using System.IO;
+using System.IO.Compression;
 using System.Text;
 using System.Timers;
 using System.Transactions;
@@ -239,8 +241,9 @@ async Task RunAsync(string draftContentFilePath)
                 foreach (var animation in animations)
                 {
                     string? name = animation.Value<string>("name");
+                    string? path = animation.Value<string>("path");
                     string? resource_id = animation.Value<string>("resource_id");
-                    if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(resource_id))
+                    if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(resource_id) || !Directory.Exists(path))
                         continue;
 
                     string? type = animation.Value<string>("type");
@@ -257,14 +260,19 @@ async Task RunAsync(string draftContentFilePath)
                         continue;
                     }
 
-                    string fileName = $"{resource_id}.json";
-                    string jsonFilePath = Path.Combine(AnimationsDir, dirName, childDirName, fileName);
-
+                    string jsonFileName = $"{resource_id}.json";
+                    string jsonFilePath = Path.Combine(AnimationsDir, dirName, childDirName, jsonFileName);
                     if (!File.Exists(jsonFilePath))
                     {
-                        Console.WriteLine($"Write animation {dirName} {type}: {name} ({fileName})");
+                        Console.WriteLine($"Write animation {dirName} {type}: {name} ({jsonFileName})");
                         string json = JsonConvert.SerializeObject(animation, Formatting.Indented);
                         await File.WriteAllTextAsync(jsonFilePath, json);
+                    }
+                    string zipFileName = $"{resource_id}.zip";
+                    string zipFilePath = Path.Combine(AnimationsDir, dirName, childDirName, zipFileName);
+                    if (!File.Exists(zipFilePath))
+                    {
+                        ZipFile.CreateFromDirectory(path, zipFilePath);
                     }
                 }
             }
@@ -276,8 +284,9 @@ async Task RunAsync(string draftContentFilePath)
             foreach (var transition in transitions)
             {
                 string? name = transition.Value<string>("name");
+                string? path = transition.Value<string>("path");
                 string? resource_id = transition.Value<string>("resource_id");
-                if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(resource_id))
+                if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(resource_id) || !Directory.Exists(path))
                     continue;
 
                 string fileName = $"{resource_id}.json";
@@ -288,6 +297,12 @@ async Task RunAsync(string draftContentFilePath)
                     string json = JsonConvert.SerializeObject(transition, Formatting.Indented);
                     await File.WriteAllTextAsync(jsonFilePath, json);
                 }
+                string zipFileName = $"{resource_id}.zip";
+                string zipFilePath = Path.Combine(TransitionsDir, zipFileName);
+                if (!File.Exists(zipFilePath))
+                {
+                    ZipFile.CreateFromDirectory(path, zipFilePath);
+                }
             }
         }
 
@@ -297,9 +312,10 @@ async Task RunAsync(string draftContentFilePath)
             foreach (var effect in effects)
             {
                 string? type = effect.Value<string>("type");
+                string? path = effect.Value<string>("path");
                 string? name = effect.Value<string>("name");
                 string? resource_id = effect.Value<string>("resource_id");
-                if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(resource_id))
+                if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(resource_id) || !Directory.Exists(path))
                     continue;
 
                 string? dir = type switch
@@ -322,6 +338,12 @@ async Task RunAsync(string draftContentFilePath)
                     string json = JsonConvert.SerializeObject(effect, Formatting.Indented);
                     await File.WriteAllTextAsync(jsonFilePath, json);
                 }
+                string zipFileName = $"{resource_id}.zip";
+                string zipFilePath = Path.Combine(dir, zipFileName);
+                if (!File.Exists(zipFilePath))
+                {
+                    ZipFile.CreateFromDirectory(path, zipFilePath);
+                }
             }
         }
 
@@ -331,8 +353,9 @@ async Task RunAsync(string draftContentFilePath)
             foreach (var sticker in stickers)
             {
                 string? name = sticker.Value<string>("name");
+                string? path = sticker.Value<string>("path");
                 string? resource_id = sticker.Value<string>("resource_id");
-                if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(resource_id))
+                if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(resource_id) || !Directory.Exists(path))
                     continue;
 
                 string fileName = $"{resource_id}.json";
@@ -343,6 +366,12 @@ async Task RunAsync(string draftContentFilePath)
                     string json = JsonConvert.SerializeObject(sticker, Formatting.Indented);
                     await File.WriteAllTextAsync(jsonFilePath, json);
                 }
+                string zipFileName = $"{resource_id}.zip";
+                string zipFilePath = Path.Combine(StickersDir, zipFileName);
+                if (!File.Exists(zipFilePath))
+                {
+                    ZipFile.CreateFromDirectory(path, zipFilePath);
+                }
             }
         }
 
@@ -352,11 +381,10 @@ async Task RunAsync(string draftContentFilePath)
             foreach (var audio in audios)
             {
                 string? type = audio.Value<string>("type");
+                string? path = audio.Value<string>("path");
                 string? name = audio.Value<string>("name");
                 string? music_id = audio.Value<string>("music_id");
-                if (string.IsNullOrWhiteSpace(type)
-                    || string.IsNullOrWhiteSpace(music_id)
-                    )
+                if (string.IsNullOrWhiteSpace(type) || string.IsNullOrWhiteSpace(music_id) || !File.Exists(path))
                     continue;
                 if ("music".Equals(type))
                 {
@@ -367,6 +395,14 @@ async Task RunAsync(string draftContentFilePath)
                         Console.WriteLine($"Write audio: {name} ({fileName})");
                         string json = JsonConvert.SerializeObject(audio, Formatting.Indented);
                         await File.WriteAllTextAsync(jsonFilePath, json);
+                    }
+                    string zipFileName = $"{music_id}.zip";
+                    string zipFilePath = Path.Combine(AudiosDir, zipFileName);
+                    if (!File.Exists(zipFilePath))
+                    {
+                        using FileStream zipToOpen = new FileStream(zipFilePath, FileMode.Create);
+                        using ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Create);
+                        archive.CreateEntryFromFile(path, Path.GetFileName(path));
                     }
                 }
             }
