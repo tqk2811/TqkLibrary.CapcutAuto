@@ -19,7 +19,14 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Materials
         internal static CapcutMaterialAudioExtractMusic Create(DraftMetaInfo.DraftMaterialValueAudio draftMaterialValueAudio)
         {
             string json = Extensions.GetEmbeddedResourceString("Materials.Audio.json");
-            return JsonConvert.DeserializeObject<CapcutMaterialAudioExtractMusic>(json, Singleton.JsonSerializerSettings)!;
+            JObject jObject = JObject.Parse(json);
+            return new CapcutMaterialAudioExtractMusic(jObject)
+            {
+                LocalMaterialId = draftMaterialValueAudio.Id,
+                Duration = draftMaterialValueAudio.Duration,
+                Name = draftMaterialValueAudio.ExtraInfo,
+                Path = draftMaterialValueAudio.FilePath,
+            };
         }
     }
 }
