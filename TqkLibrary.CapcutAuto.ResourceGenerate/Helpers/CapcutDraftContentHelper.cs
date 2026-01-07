@@ -32,8 +32,15 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Helpers
             //pre calc
             DraftContent.Id = Guid.NewGuid();
 
-
-
+            int trackRenderIndex = 0;
+            foreach (var track in CapcutTracks)
+            {
+                foreach (var segment in track.Segments)
+                {
+                    segment.TrackRenderIndex = trackRenderIndex;
+                }
+                trackRenderIndex++;
+            }
 
             foreach (JProperty material in _jobject["materials"]!)
             {
