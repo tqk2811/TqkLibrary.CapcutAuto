@@ -17,10 +17,6 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Tracks.Segments
         public SegmentClip Clip { get; init; } = new();
 
 
-
-        [JsonIgnore]
-        public CapcutMaterialSpeed MaterialSpeed { get; set; } = new();
-
         [JsonIgnore]
         public CapcutMaterialPlaceHolderInfo MaterialPlaceHolderInfo { get; set; } = new();
 
@@ -45,12 +41,6 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Tracks.Segments
         [JsonIgnore]
         public CapcutMaterialVocalSeparation MaterialVocalSeparation { get; set; } = new();
 
-        [JsonProperty("speed")]
-        public override double Speed
-        {
-            get => MaterialSpeed.Speed;
-            set => MaterialSpeed.Speed = value;
-        }
 
         protected override IEnumerable<CapcutId> GetExtraMaterialRefs()
         {

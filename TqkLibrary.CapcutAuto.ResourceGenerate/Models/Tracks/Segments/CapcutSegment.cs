@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using TqkLibrary.CapcutAuto.ResourceGenerate.Models.Materials;
 
 namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Tracks.Segments
 {
@@ -16,20 +17,32 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Tracks.Segments
             get { return GetMaterial().Id; }
         }
 
+        [JsonIgnore]
+        public CapcutMaterialSpeed MaterialSpeed { get; } = new();
+
         [JsonProperty("speed")]
-        public virtual double Speed { get; set; } = 1.0;
+        public double Speed
+        {
+            get
+            {
+                return SourceTimerange.Duration / TargetTimerange.Duration;
+            }
+        }
 
         [JsonProperty("render_index")]
         public long RenderIndex { get; set; } = 0;
 
         [JsonProperty("source_timerange")]
-        public CapcutTimeRange? SourceTimerange { get; set; }
+        public required CapcutTimeRange SourceTimerange { get; set; }
 
         [JsonProperty("target_timerange")]
         public required CapcutTimeRange TargetTimerange { get; set; }
 
         [JsonProperty("volume")]
         public required double Volume { get; set; }
+
+        [JsonProperty("track_render_index")]
+        public int TrackRenderIndex { get; internal set; }
 
         protected abstract IEnumerable<CapcutId> GetExtraMaterialRefs();
         protected abstract CapcutId GetMaterial();
