@@ -126,7 +126,9 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Helpers
         public async Task WriteProjectAsync(CancellationToken cancellationToken = default)
         {
             //update _rootMetaInfo and _draftMetaInfo from DraftContent
-
+            if (Directory.Exists(_draftMetaInfo.DraftFolderPath))
+                Directory.Delete(_draftMetaInfo.DraftFolderPath, true);
+            Directory.CreateDirectory(_draftMetaInfo.DraftFolderPath);
             using (Stream cover_stream = Extensions.GetEmbeddedResourceStream("cover.jpg"))
             {
                 using FileStream fileStream = new FileStream(
@@ -137,6 +139,7 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Helpers
                     );
                 await cover_stream.CopyToAsync(fileStream, cancellationToken);
             }
+
             await File.WriteAllTextAsync(
                 Path.Combine(DraftRootPath, "root_meta_info.json"),
                 _rootMetaInfo.GetCapcutJsonString(),
