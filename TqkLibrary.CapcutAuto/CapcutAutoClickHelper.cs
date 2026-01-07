@@ -127,6 +127,7 @@ namespace TqkLibrary.CapcutAuto
             capture.MaxFps = 6;
 
             var setupResult = await capture.InitWindowAsync(windowHelper.WindowHandle);
+            await Task.Delay(500);
             using Bitmap? bitmap = await capture.CaptureImageAsync();
             if (bitmap is null) throw new Exception($"Can't capture image");
 
