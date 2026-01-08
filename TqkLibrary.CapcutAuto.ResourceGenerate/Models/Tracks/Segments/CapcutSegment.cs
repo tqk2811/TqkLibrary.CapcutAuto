@@ -25,6 +25,7 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Tracks.Segments
         {
             get
             {
+                if (SourceTimerange is null) return 1.0;
                 return SourceTimerange.Duration / TargetTimerange.Duration;
             }
         }
@@ -33,7 +34,7 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Tracks.Segments
         public long RenderIndex { get; set; } = 0;
 
         [JsonProperty("source_timerange")]
-        public required CapcutTimeRange SourceTimerange { get; set; }
+        public virtual CapcutTimeRange? SourceTimerange { get; set; }//video, audio ; sticker, text is null
 
         [JsonProperty("target_timerange")]
         public required CapcutTimeRange TargetTimerange { get; set; }

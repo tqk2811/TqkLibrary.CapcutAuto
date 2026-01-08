@@ -12,6 +12,7 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Tracks.Segments
             return MaterialAudio;
         }
 
+        public required override CapcutTimeRange SourceTimerange { get; set; }//video, audio ; sticker, text is null
 
         [JsonIgnore]
         public CapcutMaterialPlaceHolderInfo MaterialPlaceHolderInfo { get; set; } = new();

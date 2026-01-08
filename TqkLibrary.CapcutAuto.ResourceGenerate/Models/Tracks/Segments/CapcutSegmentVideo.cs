@@ -13,6 +13,9 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Tracks.Segments
         }
 
 
+        public required override CapcutTimeRange SourceTimerange { get; set; }//video, audio ; sticker, text is null
+
+
         [JsonProperty("clip")]
         public SegmentClip Clip { get; init; } = new();
 
