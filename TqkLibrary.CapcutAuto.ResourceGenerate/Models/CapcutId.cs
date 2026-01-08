@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.ComponentModel;
+using TqkLibrary.CapcutAuto.ResourceGenerate.JsonConverters;
 
 namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models
 {
@@ -15,9 +17,8 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models
 
 
 
-        [JsonProperty("id", ObjectCreationHandling = ObjectCreationHandling.Replace)]
+        [JsonProperty("id")]
+        [JsonConverter(typeof(SerializeOnlyConverter))]
         public Guid Id { get; internal set; } = Guid.NewGuid();
-
-
     }
 }
