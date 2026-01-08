@@ -33,8 +33,24 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Materials
 
         [JsonProperty("font_path")]
         [JsonConverter(typeof(CapcutPathConverter))]
-        public required string FontPath { get; set; }
+        public string FontPath { get; protected set; }
 
+        public void SetText(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text)) throw new ArgumentNullException(nameof(text));
+            this.ContentHelper.Text = text;
+            this.ContentHelper.Styles.First().Range = new() { 0, text.Length };
+        }
+        public void SetFont(string path)
+        {
+            if (!File.Exists(path)) throw new FileNotFoundException(path);
+            FontPath = path;
+        }
+        public void SetFontSize(int size)
+        {
+            if (size < 8) throw new InvalidOperationException("Font size should larger than 8");
+            this.ContentHelper.Styles.First().Size = size;
+        }
 
 
         public static CapcutMaterialText Parse(string json)
@@ -58,17 +74,17 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Materials
 
             public class _Style
             {
-                [JsonProperty("fill")]
-                public required _Fill Fill { get; set; }
+                //[JsonProperty("fill")]
+                //public required _Fill Fill { get; set; }
 
-                [JsonProperty("font")]
-                public required _Font Font { get; set; }
+                //[JsonProperty("font")]
+                //public required _Font Font { get; set; }
 
                 [JsonProperty("size")]
                 public required double Size { get; set; }
 
-                [JsonProperty("effectStyle")]
-                public required _EffectStyle EffectStyle { get; set; }
+                //[JsonProperty("effectStyle")]
+                //public required _EffectStyle EffectStyle { get; set; }
 
                 [JsonProperty("range")]
                 public required List<int> Range { get; set; }
