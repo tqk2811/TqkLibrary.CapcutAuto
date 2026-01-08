@@ -1,10 +1,11 @@
 ﻿using Newtonsoft.Json;
 using TqkLibrary.CapcutAuto.ResourceGenerate.Enums;
+using TqkLibrary.CapcutAuto.ResourceGenerate.Interfaces;
 using TqkLibrary.CapcutAuto.ResourceGenerate.JsonConverters;
 
 namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Materials
 {
-    public sealed class CapcutMaterialTransition : CapcutMaterial
+    public sealed class CapcutMaterialTransition : CapcutMaterial, ICapcutPath
     {
         [JsonConstructor]
         private CapcutMaterialTransition()

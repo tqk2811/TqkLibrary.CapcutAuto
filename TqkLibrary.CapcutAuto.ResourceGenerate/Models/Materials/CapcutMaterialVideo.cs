@@ -2,11 +2,12 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using TqkLibrary.CapcutAuto.ResourceGenerate.Enums;
+using TqkLibrary.CapcutAuto.ResourceGenerate.Interfaces;
 using TqkLibrary.CapcutAuto.ResourceGenerate.JsonConverters;
 
 namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Materials
 {
-    public class CapcutMaterialVideo : CapcutMaterial
+    public class CapcutMaterialVideo : CapcutMaterial, ICapcutPath
     {
         private CapcutMaterialVideo(JObject jObject) : base(jObject)
         {

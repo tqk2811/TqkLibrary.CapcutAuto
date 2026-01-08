@@ -1,10 +1,11 @@
 ﻿using Newtonsoft.Json;
 using TqkLibrary.CapcutAuto.ResourceGenerate.Enums;
+using TqkLibrary.CapcutAuto.ResourceGenerate.Interfaces;
 using TqkLibrary.CapcutAuto.ResourceGenerate.JsonConverters;
 
 namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Animations
 {
-    public abstract class CapcutAnimation : BaseCapcut
+    public abstract class CapcutAnimation : BaseCapcut, ICapcutPath
     {
         [JsonProperty("category_id")]
         public required string CategoryId { get; init; }
