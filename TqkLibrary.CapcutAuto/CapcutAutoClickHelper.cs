@@ -9,12 +9,14 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Tesseract;
 using TqkLibrary.Automation.Images;
 using TqkLibrary.WinApi;
 using TqkLibrary.WinApi.Helpers;
 using TqkLibrary.WinApi.WmiHelpers;
 using TqkLibrary.WindowCapture;
 using TqkLibrary.WindowCapture.Captures;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace TqkLibrary.CapcutAuto
 {
@@ -30,9 +32,16 @@ namespace TqkLibrary.CapcutAuto
             "Apps\\CapCut.exe"
             ));
 
+        public static TimeSpan WaitCloseProcessTimeout { get; set; } = TimeSpan.FromSeconds(10);
+        public static TimeSpan DelayBeforeWindowShow { get; set; } = TimeSpan.FromSeconds(20);
+        public static TimeSpan WaitWindowTimeout { get; set; } = TimeSpan.FromSeconds(20);
+        public static TimeSpan CheckImageTimeout { get; set; } = TimeSpan.FromSeconds(30);
+        public static TimeSpan SetupCaptureTimeout { get; set; } = TimeSpan.FromSeconds(10);
+        public static TimeSpan WaitRenderTimeout { get; set; } = TimeSpan.FromMinutes(5);
+
         public static async Task CloseWindowAsync(CancellationToken cancellationToken = default)
         {
-            using CancellationTokenSource timeout = new CancellationTokenSource(10000);
+            using CancellationTokenSource timeout = new CancellationTokenSource(WaitCloseProcessTimeout);
             while (true)
             {
                 var processes = Process.GetProcessesByName("Capcut");
@@ -87,7 +96,7 @@ namespace TqkLibrary.CapcutAuto
             using var rootProcess = Process.Start(processStartInfo)!;
             ProcessHelper processHelper = new ProcessHelper(rootProcess.Id);
             ProcessHelper? child = null;
-            using CancellationTokenSource timeout = new CancellationTokenSource(10000);
+            using CancellationTokenSource timeout = new CancellationTokenSource(WaitWindowTimeout);
             while (true)
             {
                 child = processHelper.ChildrensProcess.FirstOrDefault();//Apps\7.7.0.3143\CapCut.exe
@@ -112,32 +121,65 @@ namespace TqkLibrary.CapcutAuto
                 && "Qt622QWindowIcon".Equals(x.ClassName, StringComparison.OrdinalIgnoreCase)
                 );
             WindowHelper? windowHelper = null;
-            using CancellationTokenSource timeout = new CancellationTokenSource(10000);
-            while (windowHelper is null)
+            using (CancellationTokenSource timeout = new CancellationTokenSource(WaitWindowTimeout))
             {
-                if (timeout.IsCancellationRequested)
+                while (windowHelper is null)
                 {
-                    throw new TimeoutException("Waitting window timeout");
+                    if (timeout.IsCancellationRequested)
+                    {
+                        throw new TimeoutException("Waitting window timeout");
+                    }
+                    await Task.Delay(100, cancellationToken);
+                    windowHelper = windows.FirstOrDefault();
                 }
-                await Task.Delay(100, cancellationToken);
-                windowHelper = windows.FirstOrDefault();
             }
-            await Task.Delay(1000, cancellationToken);
+            await Task.Delay(DelayBeforeWindowShow, cancellationToken);
+
+            //init capture
             using var capture = new WinrtGraphicCapture();
             capture.MaxFps = 6;
-
-            var setupResult = await capture.InitWindowAsync(windowHelper.WindowHandle);
-            await Task.Delay(500);
-            using Bitmap? bitmap = await capture.CaptureImageAsync();
-            if (bitmap is null) throw new Exception($"Can't capture image");
-
-            using Image<Gray, byte> imageGray = bitmap.ToImage<Gray, byte>();
-            Rectangle? rectangle = FindWhiteCover(imageGray);
-            if (rectangle.HasValue)
+            if (WinrtGraphicCapture.IsCaptureCursorToggleSupported)
+                capture.IsShowCursor = false;
+            using (CancellationTokenSource timeout = new CancellationTokenSource(SetupCaptureTimeout))
             {
-                await windowHelper.WindowHandle.ControlLClickAsync(rectangle.Value.GetCenter());
+                while (!await capture.InitWindowAsync(windowHelper.WindowHandle))
+                {
+                    if (timeout.IsCancellationRequested)
+                        throw new Exception($"Init capture window failed");
+                    await Task.Delay(500);
+                }
             }
-            return rectangle.HasValue;
+            await Task.Delay(500);
+
+
+            //capture & click
+            using (CancellationTokenSource timeout = new CancellationTokenSource(CheckImageTimeout))
+            {
+                while (true)
+                {
+                    using Bitmap? bitmap = await capture.CaptureImageAsync();
+                    Rectangle? rectangle = null;
+                    if (bitmap is not null)
+                    {
+                        using Image<Gray, byte> imageGray = bitmap.ToImage<Gray, byte>();
+                        rectangle = FindWhiteCover(imageGray);
+                        if (rectangle.HasValue)
+                        {
+                            await windowHelper.WindowHandle.ControlLClickAsync(rectangle.Value.GetCenter());
+                            return true;
+                        }
+                    }
+                    if (timeout.IsCancellationRequested)
+                    {
+                        if (bitmap is null)
+                            throw new Exception($"Can't capture image");
+                        if (!rectangle.HasValue)
+                            throw new Exception($"WhiteCover not found");
+                        return false;
+                    }
+                    await Task.Delay(500, cancellationToken);
+                }
+            }
         }
 
         public async Task<bool> ClickExportAsync(CancellationToken cancellationToken = default)
@@ -150,45 +192,74 @@ namespace TqkLibrary.CapcutAuto
                 && "Qt622QWindowIcon".Equals(x.ClassName, StringComparison.OrdinalIgnoreCase)
                 );
             WindowHelper? windowHelper = null;
-            using CancellationTokenSource timeout = new CancellationTokenSource(10000);
-            while (windowHelper is null)
+            using (CancellationTokenSource timeout = new CancellationTokenSource(WaitWindowTimeout))
             {
-                if (timeout.IsCancellationRequested)
+                while (windowHelper is null)
                 {
-                    throw new TimeoutException("Waitting window timeout");
+                    if (timeout.IsCancellationRequested)
+                        throw new TimeoutException("Waitting window timeout");
+                    await Task.Delay(100, cancellationToken);
+                    windowHelper = windows.FirstOrDefault();
                 }
-                await Task.Delay(100, cancellationToken);
-                windowHelper = windows.FirstOrDefault();
             }
             await Task.Delay(1000, cancellationToken);
+
+
+
             using var capture = new WinrtGraphicCapture();
             capture.MaxFps = 6;
             if (WinrtGraphicCapture.IsCaptureCursorToggleSupported)
                 capture.IsShowCursor = false;
-
-            var setupResult = await capture.InitWindowAsync(windowHelper.WindowHandle);
-            if (!setupResult) throw new Exception($"Init capture window failed");
-            await Task.Delay(500, cancellationToken);
-            using Bitmap? bitmap = await capture.CaptureImageAsync();
-            if (bitmap is null) throw new Exception($"Can't capture image");
-
-            using Image<Hsv, byte> imageHsv = bitmap.ToImage<Hsv, byte>();
-
-            Rectangle? rect = FindBlueButton(imageHsv);
-            if (rect.HasValue)
+            using (CancellationTokenSource timeout = new CancellationTokenSource(SetupCaptureTimeout))
             {
-                await windowHelper.WindowHandle.ControlLClickAsync(rect.Value.GetCenter());
+                while (!await capture.InitWindowAsync(windowHelper.WindowHandle))
+                {
+                    if (timeout.IsCancellationRequested)
+                        throw new Exception($"Init capture window failed");
+                    await Task.Delay(500);
+                }
             }
-            return rect.HasValue;
+            await Task.Delay(500);
+
+
+
+            //capture & click
+            using (CancellationTokenSource timeout = new CancellationTokenSource(CheckImageTimeout))
+            {
+                while (true)
+                {
+                    using Bitmap? bitmap = await capture.CaptureImageAsync();
+                    Rectangle? rectangle = null;
+                    if (bitmap is not null)
+                    {
+                        using Image<Hsv, byte> imageHsv = bitmap.ToImage<Hsv, byte>();
+                        rectangle = FindBlueButton(imageHsv, new Rectangle(imageHsv.Width - 450, 0, 450, 80), 900);
+                        if (rectangle.HasValue)
+                        {
+                            await windowHelper.WindowHandle.ControlLClickAsync(rectangle.Value.GetCenter());
+                            return true;
+                        }
+                    }
+                    if (timeout.IsCancellationRequested)
+                    {
+                        if (bitmap is null)
+                            throw new Exception($"Can't capture image");
+                        if (!rectangle.HasValue)
+                            throw new Exception($"FindBlueButton not found");
+                        return false;
+                    }
+                    await Task.Delay(500, cancellationToken);
+                }
+            }
         }
 
 
-        public async Task<bool> ExportAsync(CancellationToken cancellationToken = default)
+        public async Task<bool> ExportRenderAsync(CancellationToken cancellationToken = default)
         {
             if (_rootProcess is null) throw new InvalidOperationException($"Run {nameof(OpenCapcutAsync)} first");
 
             WindowHelper? capcutWindowHelper = null;
-            using (CancellationTokenSource timeout = new CancellationTokenSource(10000))
+            using (CancellationTokenSource timeout = new CancellationTokenSource(WaitWindowTimeout))
             {
                 var capcutWindows = _rootProcess.WindowsTree.Where(x =>
                     x.IsAltTabWindow
@@ -207,7 +278,7 @@ namespace TqkLibrary.CapcutAuto
             }
 
             WindowHelper? exportWindowHelper = null;
-            using (CancellationTokenSource timeout = new CancellationTokenSource(10000))
+            using (CancellationTokenSource timeout = new CancellationTokenSource(WaitWindowTimeout))
             {
                 var exportWindows = _rootProcess.AllWindows.Where(x =>
                     "Export".Equals(x.Title, StringComparison.OrdinalIgnoreCase)
@@ -229,22 +300,13 @@ namespace TqkLibrary.CapcutAuto
             capture.MaxFps = 6;
             if (WinrtGraphicCapture.IsCaptureCursorToggleSupported)
                 capture.IsShowCursor = false;
-
-            //bool isMonitorCapture = false;
             bool setupResult = false;
-            //setupResult = await capture.InitWindowAsync(exportWindowHelper.WindowHandle);
-            //if (!setupResult)
-            //{
-            //    setupResult = await capture.InitWindowAsync(capcutWindowHelper.WindowHandle);
-            //}
-            //if (!setupResult)
             {
                 IntPtr? hmonitor = MonitorHelper.Monitors.FirstOrDefault();
                 if (!hmonitor.HasValue) throw new Exception($"Can't get monitor handle");
 
                 setupResult = await capture.InitMonitorAsync(hmonitor.Value);
                 if (!setupResult) throw new Exception($"Init capture window failed");
-                //isMonitorCapture = true;
             }
 
 
@@ -257,18 +319,16 @@ namespace TqkLibrary.CapcutAuto
             using Image<Hsv, byte> screenHsv = bitmap.ToImage<Hsv, byte>();
             Rectangle? windowArea = exportWindowHelper.GetArea();
             if (!windowArea.HasValue) throw new Exception($"failed to get window area");
-            using Image<Hsv, byte> screenHsv_crop = screenHsv.Copy(windowArea.Value);
 
-            Rectangle? rectButton = FindBlueButton(screenHsv_crop);
+            Rectangle? rectButton = FindBlueButton(screenHsv, windowArea.Value, 1500);
             if (rectButton.HasValue)
             {
                 Point center = rectButton.Value.GetCenter();
-                Point point = new Point(windowArea.Value.X + center.X, windowArea.Value.Y + center.Y);
-                await exportWindowHelper.MouseClickAsync(point);//click export
+                await exportWindowHelper.MouseClickAsync(center);//click export
 
                 await Task.Delay(5000, cancellationToken);
                 //render & chờ nút share
-                using (CancellationTokenSource timeout = new CancellationTokenSource(2 * 60000))
+                using (CancellationTokenSource timeout = new CancellationTokenSource(WaitRenderTimeout))
                 {
                     while (true)
                     {
@@ -276,8 +336,7 @@ namespace TqkLibrary.CapcutAuto
                         using Bitmap? bitmap2 = await capture.CaptureImageAsync();
                         if (bitmap2 is null) throw new Exception($"Can't capture image");
                         using Image<Hsv, byte> screenHsv2 = bitmap2.ToImage<Hsv, byte>();
-                        using Image<Hsv, byte> screenHsv2_crop = screenHsv2.Copy(windowArea.Value);
-                        Rectangle? rectButton2 = FindBlueButton(screenHsv2_crop);//share button
+                        Rectangle? rectButton2 = FindBlueButton(screenHsv2, windowArea.Value, 1500);//share button
                         if (rectButton2.HasValue)
                         {
                             return true;
@@ -297,7 +356,7 @@ namespace TqkLibrary.CapcutAuto
 
 
 
-        static Rectangle? FindWhiteCover(Image<Gray, byte> imageGray, double areaSize = 500)
+        static Rectangle? FindWhiteCover(Image<Gray, byte> imageGray, double areaSize = 4500)
         {
             using Image<Gray, byte> imgThreshold = imageGray.ThresholdBinary(new Gray(230), new Gray(255));
 
@@ -343,20 +402,40 @@ namespace TqkLibrary.CapcutAuto
             return largestSquare;
         }
 
-        static Rectangle? FindBlueButton(Image<Hsv, byte> imageHsv, double areaSize = 500)
+        static Rectangle? FindBlueButton(Image<Hsv, byte> imageHsv, Rectangle crop, double areaSize = 500)//450 x 80 top left
         {
-            using Image<Gray, byte> mask = imageHsv.InRange(new Hsv(79, 111, 109), new Hsv(96, 255, 255));
-            CvInvoke.MedianBlur(mask, mask, 5);
+            using var imageHsvCrop = imageHsv.Copy(crop);
+            using Image<Gray, byte> mask = imageHsvCrop.InRange(new Hsv(79, 111, 109), new Hsv(96, 255, 255));
+            //mask.Save("C:\\BlueButtonMark.png");
+            using Image<Gray, byte> maskBlur = new(mask.Size);
+            CvInvoke.MedianBlur(mask, maskBlur, 5);
 
             using VectorOfVectorOfPoint contours = new VectorOfVectorOfPoint();
             using Mat hierarchy = new Mat();
-            CvInvoke.FindContours(mask, contours, hierarchy, RetrType.External, ChainApproxMethod.ChainApproxSimple);
+            CvInvoke.FindContours(maskBlur, contours, hierarchy, RetrType.External, ChainApproxMethod.ChainApproxSimple);
             for (int i = 0; i < contours.Size; i++)
             {
                 double area = CvInvoke.ContourArea(contours[i]);
                 if (area > areaSize)
                 {
-                    return CvInvoke.BoundingRectangle(contours[i]);
+                    Rectangle rectangle = CvInvoke.BoundingRectangle(contours[i]);
+
+                    using var grayCropButton = mask.Copy(rectangle);
+                    using var grayCropButtonScale = grayCropButton.Resize(2.0, Inter.Cubic);
+                    grayCropButtonScale.Save("C:\\BlueButtonMark.png");
+
+                    using var tessEngine = new TesseractEngine(Path.Combine(AppContext.BaseDirectory, "TessDatas"), "eng", EngineMode.Default);
+                    tessEngine.SetVariable("tessedit_char_whitelist", new string("ExportPost".Distinct().ToArray()));
+
+                    using Bitmap preTess = grayCropButtonScale.ToBitmap();
+                    using var img = PixConverter.ToPix(preTess);
+                    using var page = tessEngine.Process(img, PageSegMode.SingleLine);
+                    string text = page.GetText();
+                    text = text.Trim().Replace(" ", string.Empty);
+                    if ("Export".Equals(text, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return new Rectangle(crop.X + rectangle.X, crop.Y + rectangle.Y, rectangle.Width, rectangle.Height);
+                    }
                 }
             }
 
