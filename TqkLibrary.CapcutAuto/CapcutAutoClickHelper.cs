@@ -233,8 +233,8 @@ namespace TqkLibrary.CapcutAuto
                     if (bitmap is not null)
                     {
                         using Image<Hsv, byte> imageHsv = bitmap.ToImage<Hsv, byte>();
-                        rectangle = FindBlueButton(imageHsv, new Rectangle(imageHsv.Width - 450, 0, 450, 80), 900);
-                        if (rectangle.HasValue)
+                        (rectangle, string? name) = FindBlueButton(imageHsv, new Rectangle(imageHsv.Width - 450, 0, 450, 80), "Export", 900);
+                        if (rectangle.HasValue && "Export".Equals(name, StringComparison.OrdinalIgnoreCase))
                         {
                             await windowHelper.WindowHandle.ControlLClickAsync(rectangle.Value.GetCenter());
                             return true;
@@ -317,33 +317,43 @@ namespace TqkLibrary.CapcutAuto
             //bitmap.Save("C:\\export.png");
 
             using Image<Hsv, byte> screenHsv = bitmap.ToImage<Hsv, byte>();
-            Rectangle? windowArea = exportWindowHelper.GetArea();
-            if (!windowArea.HasValue) throw new Exception($"failed to get window area");
 
-            Rectangle? rectButton = FindBlueButton(screenHsv, windowArea.Value, 1500);
-            if (rectButton.HasValue)
+            //render & chờ nút share
+            using (CancellationTokenSource timeout = new CancellationTokenSource(WaitRenderTimeout))
             {
-                Point center = rectButton.Value.GetCenter();
-                await exportWindowHelper.MouseClickAsync(center);//click export
-
-                await Task.Delay(5000, cancellationToken);
-                //render & chờ nút share
-                using (CancellationTokenSource timeout = new CancellationTokenSource(WaitRenderTimeout))
+                while (true)
                 {
-                    while (true)
+                    if (timeout.IsCancellationRequested)
                     {
-                        await Task.Delay(1000, cancellationToken);
-                        using Bitmap? bitmap2 = await capture.CaptureImageAsync();
-                        if (bitmap2 is null) throw new Exception($"Can't capture image");
-                        using Image<Hsv, byte> screenHsv2 = bitmap2.ToImage<Hsv, byte>();
-                        Rectangle? rectButton2 = FindBlueButton(screenHsv2, windowArea.Value, 1500);//share button
-                        if (rectButton2.HasValue)
+                        throw new TimeoutException($"Render timeout");
+                    }
+                    await Task.Delay(1000, cancellationToken);
+
+                    Rectangle? windowArea = exportWindowHelper.GetArea();
+                    if (!windowArea.HasValue) continue;
+
+                    using Bitmap? bitmap2 = await capture.CaptureImageAsync();
+                    if (bitmap2 is null) continue;
+                    using Image<Hsv, byte> screenHsv2 = bitmap2.ToImage<Hsv, byte>();
+
+                    Rectangle bottomWindow = new Rectangle(
+                        windowArea.Value.X + windowArea.Value.Width - 250,
+                        windowArea.Value.Y + windowArea.Value.Height - 66,
+                        250,
+                        66
+                        );
+                    (Rectangle? rectButton, string? name) = FindBlueButton(screenHsv2, bottomWindow, "ExportShare", 1000);//miss click
+                    if (rectButton.HasValue)
+                    {
+                        if ("Export".Equals(name, StringComparison.OrdinalIgnoreCase))
+                        {
+                            Point center = rectButton.Value.GetCenter();
+                            await exportWindowHelper.MouseClickAsync(center);//click export
+                            continue;
+                        }
+                        else if ("Share".Equals(name, StringComparison.OrdinalIgnoreCase))
                         {
                             return true;
-                        }
-                        if (timeout.IsCancellationRequested)
-                        {
-                            throw new TimeoutException($"Render timeout");
                         }
                     }
                 }
@@ -402,7 +412,7 @@ namespace TqkLibrary.CapcutAuto
             return largestSquare;
         }
 
-        static Rectangle? FindBlueButton(Image<Hsv, byte> imageHsv, Rectangle crop, double areaSize = 500)//450 x 80 top left
+        static (Rectangle?, string?) FindBlueButton(Image<Hsv, byte> imageHsv, Rectangle crop, string whiteList, double areaSize = 500)//450 x 80 top left
         {
             using var imageHsvCrop = imageHsv.Copy(crop);
             using Image<Gray, byte> mask = imageHsvCrop.InRange(new Hsv(79, 111, 109), new Hsv(96, 255, 255));
@@ -422,24 +432,23 @@ namespace TqkLibrary.CapcutAuto
 
                     using var grayCropButton = mask.Copy(rectangle);
                     using var grayCropButtonScale = grayCropButton.Resize(2.0, Inter.Cubic);
+#if DEBUG
                     grayCropButtonScale.Save("C:\\BlueButtonMark.png");
+#endif
 
                     using var tessEngine = new TesseractEngine(Path.Combine(AppContext.BaseDirectory, "TessDatas"), "eng", EngineMode.Default);
-                    tessEngine.SetVariable("tessedit_char_whitelist", new string("ExportPost".Distinct().ToArray()));
+                    tessEngine.SetVariable("tessedit_char_whitelist", new string(whiteList.Distinct().ToArray()));
 
                     using Bitmap preTess = grayCropButtonScale.ToBitmap();
                     using var img = PixConverter.ToPix(preTess);
                     using var page = tessEngine.Process(img, PageSegMode.SingleLine);
                     string text = page.GetText();
                     text = text.Trim().Replace(" ", string.Empty);
-                    if ("Export".Equals(text, StringComparison.OrdinalIgnoreCase))
-                    {
-                        return new Rectangle(crop.X + rectangle.X, crop.Y + rectangle.Y, rectangle.Width, rectangle.Height);
-                    }
+                    return (new Rectangle(crop.X + rectangle.X, crop.Y + rectangle.Y, rectangle.Width, rectangle.Height), text);
                 }
             }
 
-            return null;
+            return (null, null);
         }
     }
 }
