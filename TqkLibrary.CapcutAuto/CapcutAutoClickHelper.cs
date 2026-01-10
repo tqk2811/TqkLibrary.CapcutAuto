@@ -38,6 +38,7 @@ namespace TqkLibrary.CapcutAuto
         public static TimeSpan DelayBeforeWindowShow { get; set; } = TimeSpan.FromSeconds(20);
         public static TimeSpan WaitWindowTimeout { get; set; } = TimeSpan.FromSeconds(20);
         public static TimeSpan CheckImageTimeout { get; set; } = TimeSpan.FromSeconds(30);
+        public static TimeSpan CheckImageAndWaitProjectTimeout { get; set; } = TimeSpan.FromMinutes(1);
         public static TimeSpan SetupCaptureTimeout { get; set; } = TimeSpan.FromSeconds(10);
         public static TimeSpan WaitRenderTimeout { get; set; } = TimeSpan.FromMinutes(5);
 
@@ -220,7 +221,7 @@ namespace TqkLibrary.CapcutAuto
                 }
             }
 
-            await Task.Delay(500, cancellationToken);
+            await Task.Delay(DelayBeforeWindowShow, cancellationToken);
 
 
 
@@ -239,9 +240,13 @@ namespace TqkLibrary.CapcutAuto
             }
 
             //capture & click
-            using (CancellationTokenSource timeout = new CancellationTokenSource(CheckImageTimeout))
+            using (CancellationTokenSource timeout = new CancellationTokenSource(CheckImageAndWaitProjectTimeout))
             {
-                while (true)
+                var exportWindows = _rootProcess.AllWindows.Where(x =>
+                     "Export".Equals(x.Title, StringComparison.OrdinalIgnoreCase)
+                     && "Qt622QWindowIcon".Equals(x.ClassName, StringComparison.OrdinalIgnoreCase)
+                     );
+                while (!exportWindows.Any())
                 {
                     await Task.Delay(500, cancellationToken);
                     using Bitmap? bitmap = await capture.CaptureImageAsync();
@@ -255,7 +260,6 @@ namespace TqkLibrary.CapcutAuto
                         if (rectangle.HasValue && "Export".Equals(name, StringComparison.OrdinalIgnoreCase))
                         {
                             await windowHelper.WindowHandle.ControlLClickAsync(rectangle.Value.GetCenter());
-                            return;
                         }
                     }
 
@@ -348,9 +352,9 @@ namespace TqkLibrary.CapcutAuto
                     using Image<Hsv, byte> screenHsv = bitmap.ToImage<Hsv, byte>();
 
                     Rectangle bottomWindow = new Rectangle(//bottom right
-                        windowArea.Value.X + windowArea.Value.Width - 250,
+                        windowArea.Value.X + windowArea.Value.Width - 400,
                         windowArea.Value.Y + windowArea.Value.Height - 66,
-                        250,
+                        400,
                         66
                         );
                     (Rectangle? rectButton, string? name) = FindBlueButton(screenHsv, bottomWindow, "ExportShare", 1000);//miss click
@@ -378,7 +382,7 @@ namespace TqkLibrary.CapcutAuto
             using CancellationTokenSource timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
             while (!timeout.IsCancellationRequested && !cancellationToken.IsCancellationRequested)
             {
-                await Task.Delay(500, cancellationToken);
+                await Task.Delay(100);
                 var altTabWindows = _rootProcess.AltTabWindows.Where(x => !exceptTitles.Any(y => y.Equals(x.Title, StringComparison.OrdinalIgnoreCase)));
                 foreach (var altTabWindow in altTabWindows)
                 {
