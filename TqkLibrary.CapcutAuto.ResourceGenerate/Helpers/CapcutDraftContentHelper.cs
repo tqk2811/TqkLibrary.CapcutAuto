@@ -81,10 +81,19 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Helpers
             _jobject["materials"]!["audios"] = JArray.FromObject(materials_audios, _jsonSerializer);
             _jobject["materials"]!["beats"] = JArray.FromObject(materials_a_beats, _jsonSerializer);
 
+            var stickerSegments = CapcutTracks
+                .OfType<CapcutTrackSticker>()
+                .SelectMany(x => x.Segments)
+                .OfType<CapcutSegmentSticker>();
+            var materials_sticker = stickerSegments.Select(x => x.MaterialSticker).Where(x => x is not null).ToArray();
+            var materials_sticker_Animations = stickerSegments.Select(x => x.MaterialAnimation).Where(x => x is not null).ToArray();
+            _jobject["materials"]!["stickers"] = JArray.FromObject(materials_sticker, _jsonSerializer);
+
 
             var materials_v_speeds = videoSegments.Select(x => x.MaterialSpeed).Where(x => x is not null).ToArray();
             var materials_a_speeds = audioSegments.Select(x => x.MaterialSpeed).Where(x => x is not null).ToArray();
-            var speeds = materials_v_speeds.Concat(materials_a_speeds);
+            var materials_sticker_speeds = stickerSegments.Select(x => x.MaterialSpeed).Where(x => x is not null).ToArray();
+            var speeds = materials_v_speeds.Concat(materials_a_speeds).Concat(materials_sticker_speeds);
             _jobject["materials"]!["speeds"] = JArray.FromObject(speeds.ToArray(), _jsonSerializer);
 
 
