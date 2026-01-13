@@ -17,8 +17,17 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Tracks.Segments
             get { return GetMaterial().Id; }
         }
 
+        readonly CapcutMaterialSpeed _capcutMaterialSpeed = new();
+
         [JsonIgnore]
-        public CapcutMaterialSpeed MaterialSpeed { get; } = new();
+        public CapcutMaterialSpeed MaterialSpeed
+        {
+            get
+            {
+                _capcutMaterialSpeed.Speed = Speed;
+                return _capcutMaterialSpeed;
+            }
+        }
 
         [JsonProperty("speed")]
         public double Speed
@@ -26,7 +35,7 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Tracks.Segments
             get
             {
                 if (SourceTimerange is null) return 1.0;
-                return SourceTimerange.Duration / TargetTimerange.Duration;
+                return Math.Round(SourceTimerange.Duration / TargetTimerange.Duration, 2);
             }
         }
 

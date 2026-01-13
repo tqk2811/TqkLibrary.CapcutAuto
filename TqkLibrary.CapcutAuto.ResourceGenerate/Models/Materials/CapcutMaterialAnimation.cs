@@ -66,7 +66,7 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Materials
             get { return _animations.FirstOrDefault(x => x.Type == AnimationType.loop); }
             set
             {
-                if (value is not null && value.Type != AnimationType.@out)
+                if (value is not null && value.Type != AnimationType.loop)
                     throw new InvalidOperationException($"Animation type must be '{nameof(AnimationType.loop)}'");
                 var @out = Out;
                 if (@out is not null)

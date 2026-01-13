@@ -5,6 +5,10 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Tracks.Segments
 {
     public sealed class CapcutSegmentSticker : CapcutSegment
     {
+        [JsonProperty("clip")]
+        public SegmentClip Clip { get; init; } = new();
+
+
         [JsonIgnore]
         public required CapcutMaterialSticker MaterialSticker { get; init; }
         protected override CapcutId GetMaterial()
