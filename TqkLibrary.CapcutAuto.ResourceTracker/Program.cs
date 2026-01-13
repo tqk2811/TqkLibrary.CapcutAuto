@@ -12,7 +12,7 @@ using TqkLibrary.Linq;
 
 Console.OutputEncoding = Encoding.UTF8;
 
-string test = JsonConvert.SerializeObject(Guid.NewGuid());
+string userprofile = Environment.ExpandEnvironmentVariables("%userprofile%").Replace('\\', '/');
 
 string CapcutDatasDir = Path.Combine(AppContext.BaseDirectory, "CapcutDatas");
 
@@ -62,6 +62,9 @@ Directory.CreateDirectory(TextsDir);
 
 string AudiosDir = Path.Combine(CapcutDatasDir, "Audios");
 Directory.CreateDirectory(AudiosDir);
+
+string FontsDir = Path.Combine(CapcutDatasDir, "Fonts");
+Directory.CreateDirectory(FontsDir);
 
 
 
@@ -264,6 +267,9 @@ async Task RunAsync(string draftContentFilePath)
                     string jsonFilePath = Path.Combine(AnimationsDir, dirName, childDirName, jsonFileName);
                     if (!File.Exists(jsonFilePath))
                     {
+                        string fixPath = "%userprofile%" + path.Replace('\\','/').Substring(userprofile.Length);
+                        animation["path"] = fixPath;
+
                         Console.WriteLine($"Write animation {dirName} {type}: {name} ({jsonFileName})");
                         string json = JsonConvert.SerializeObject(animation, Formatting.Indented);
                         await File.WriteAllTextAsync(jsonFilePath, json);
@@ -289,10 +295,14 @@ async Task RunAsync(string draftContentFilePath)
                 if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(resource_id) || !Directory.Exists(path))
                     continue;
 
+
                 string fileName = $"{resource_id}.json";
                 string jsonFilePath = Path.Combine(TransitionsDir, fileName);
                 if (!File.Exists(jsonFilePath))
                 {
+                    string fixPath = "%userprofile%" + path.Replace('\\', '/').Substring(userprofile.Length);
+                    transition["path"] = fixPath;
+
                     Console.WriteLine($"Write transition: {name} ({fileName})");
                     string json = JsonConvert.SerializeObject(transition, Formatting.Indented);
                     await File.WriteAllTextAsync(jsonFilePath, json);
@@ -334,6 +344,9 @@ async Task RunAsync(string draftContentFilePath)
                 string jsonFilePath = Path.Combine(dir, fileName);
                 if (!File.Exists(jsonFilePath))
                 {
+                    string fixPath = "%userprofile%" + path.Replace('\\', '/').Substring(userprofile.Length);
+                    effect["path"] = fixPath;
+
                     Console.WriteLine($"Write effect {type}: {name} ({fileName})");
                     string json = JsonConvert.SerializeObject(effect, Formatting.Indented);
                     await File.WriteAllTextAsync(jsonFilePath, json);
@@ -362,6 +375,9 @@ async Task RunAsync(string draftContentFilePath)
                 string jsonFilePath = Path.Combine(StickersDir, fileName);
                 if (!File.Exists(jsonFilePath))
                 {
+                    string fixPath = "%userprofile%" + path.Replace('\\', '/').Substring(userprofile.Length);
+                    sticker["path"] = fixPath;
+
                     Console.WriteLine($"Write sticker: {name} ({fileName})");
                     string json = JsonConvert.SerializeObject(sticker, Formatting.Indented);
                     await File.WriteAllTextAsync(jsonFilePath, json);
@@ -392,6 +408,9 @@ async Task RunAsync(string draftContentFilePath)
                     string jsonFilePath = Path.Combine(AudiosDir, fileName);
                     if (!File.Exists(jsonFilePath))
                     {
+                        string fixPath = "%userprofile%" + path.Replace('\\', '/').Substring(userprofile.Length);
+                        audio["path"] = fixPath;
+
                         Console.WriteLine($"Write audio: {name} ({fileName})");
                         string json = JsonConvert.SerializeObject(audio, Formatting.Indented);
                         await File.WriteAllTextAsync(jsonFilePath, json);
@@ -413,12 +432,46 @@ async Task RunAsync(string draftContentFilePath)
         {
             foreach (var text in texts)
             {
-                int count = Directory.GetFiles(TextsDir).Length;
-                string fileName = $"{count:000}.json";
-                string jsonFilePath = Path.Combine(TextsDir, fileName);
-                Console.WriteLine($"Write text: {fileName}");
-                string json = JsonConvert.SerializeObject(text, Formatting.Indented);
-                await File.WriteAllTextAsync(jsonFilePath, json);
+                var fonts = text["fonts"];
+                if (fonts is not null && (fonts?.Type) == JTokenType.Array)
+                {
+                    foreach (var font in fonts)
+                    {
+                        string? title = font.Value<string>("title");
+                        string? resource_id = font.Value<string>("resource_id");
+                        string? path = font.Value<string>("path");
+                        if (string.IsNullOrWhiteSpace(title) || string.IsNullOrWhiteSpace(resource_id) || !File.Exists(path))
+                            continue;
+
+                        string fileName = $"{resource_id}.json";
+                        string jsonFilePath = Path.Combine(FontsDir, fileName);
+                        if (!File.Exists(jsonFilePath))
+                        {
+                            string fixPath = "%userprofile%" + path.Replace('\\', '/').Substring(userprofile.Length);
+                            font["path"] = fixPath;
+
+                            Console.WriteLine($"Write font: {title} ({fileName})");
+                            string json = JsonConvert.SerializeObject(font, Formatting.Indented);
+                            await File.WriteAllTextAsync(jsonFilePath, json);
+                        }
+
+                        string zipFileName = $"{resource_id}.zip";
+                        string zipFilePath = Path.Combine(FontsDir, zipFileName);
+                        if (!File.Exists(zipFilePath))
+                        {
+                            using FileStream zipToOpen = new FileStream(zipFilePath, FileMode.Create);
+                            using ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Create);
+                            archive.CreateEntryFromFile(path, Path.GetFileName(path));
+                        }
+                    }
+                }
+
+                //int count = Directory.GetFiles(TextsDir).Length;
+                //string fileName = $"{count:000}.json";
+                //string jsonFilePath = Path.Combine(TextsDir, fileName);
+                //Console.WriteLine($"Write text: {fileName}");
+                //string json = JsonConvert.SerializeObject(text, Formatting.Indented);
+                //await File.WriteAllTextAsync(jsonFilePath, json);
             }
         }
     }
