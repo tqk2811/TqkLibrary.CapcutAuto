@@ -22,7 +22,15 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Materials
         public int AddType { get; set; } = 0;
 
         [JsonProperty("alignment")]
-        public int Alignment { get; set; } = 1;
+        int _Alignment { get; set; } = 1;
+
+        [JsonIgnore]
+        public MaterialTextAlignment Alignment
+        {
+            get => (MaterialTextAlignment)_Alignment;
+            set => _Alignment = (int)value;
+        }
+
 
         [JsonProperty("content")]
         private string _Content
@@ -33,18 +41,13 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Materials
 
         [JsonProperty("font_path")]
         [JsonConverter(typeof(CapcutPathConverter))]
-        public string FontPath { get; protected set; }
+        public required string FontPath { get; set; }
 
         public void SetText(string text)
         {
             if (string.IsNullOrWhiteSpace(text)) throw new ArgumentNullException(nameof(text));
             this.ContentHelper.Text = text;
             this.ContentHelper.Styles.First().Range = new() { 0, text.Length };
-        }
-        public void SetFont(string path)
-        {
-            if (!File.Exists(path)) throw new FileNotFoundException(path);
-            FontPath = path;
         }
         public void SetFontSize(int size)
         {
