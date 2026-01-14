@@ -32,14 +32,14 @@ namespace TqkLibrary.CapcutAuto.ResourceTracker.Helpers
                         string extraInfo = $"{resource_id}.ExtraInfoJson";
                         string extraInfoFilePath = Path.Combine(StickersDir, extraInfo);
                         string heycanInfo_json = Path.Combine(path, "heycanInfo.json");
-                        dynamic extraInfoData = new object();
+                        JObject extraInfoData = new JObject();
                         if (File.Exists(heycanInfo_json))
                         {
                             string json_heycanInfo_text = await File.ReadAllTextAsync(heycanInfo_json);
                             JObject data_heycanInfo = (JObject)JsonConvert.DeserializeObject(json_heycanInfo_text)!;
                             int singleWidth = data_heycanInfo.Value<int>("singleWidth");
                             int singleHeight = data_heycanInfo.Value<int>("singleHeight");
-                            extraInfoData.Size = new Size(singleWidth, singleHeight);
+                            extraInfoData["Size"] = JToken.FromObject(new Size(singleWidth, singleHeight));
                         }
                         else
                         {
@@ -82,7 +82,7 @@ namespace TqkLibrary.CapcutAuto.ResourceTracker.Helpers
                                 else
                                 {
                                     using Image bitmap = Bitmap.FromFile(pngFilePaths[0]);
-                                    extraInfoData.Size = bitmap.Size;
+                                    extraInfoData["Size"] = JToken.FromObject(bitmap.Size);
                                 }
                             }
                             else

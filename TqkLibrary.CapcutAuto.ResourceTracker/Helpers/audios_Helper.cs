@@ -75,9 +75,9 @@ namespace TqkLibrary.CapcutAuto.ResourceTracker.Helpers
 
                                 string extraInfo = $"{music_id}.ExtraInfoJson";
                                 string extraInfoFilePath = Path.Combine(AudiosDir, extraInfo);
-                                dynamic extraInfoData = new object();
-                                extraInfoData.MaxDb = maxDb;
-                                extraInfoData.AvgDb = avgDb;
+                                JObject extraInfoData = new JObject();
+                                extraInfoData["MaxDb"] = maxDb;
+                                extraInfoData["AvgDb"] = avgDb;
                                 string json_extraInfoData = JsonConvert.SerializeObject(extraInfoData, Formatting.Indented);
                                 await File.WriteAllTextAsync(extraInfoFilePath, json_extraInfoData);
                             }
