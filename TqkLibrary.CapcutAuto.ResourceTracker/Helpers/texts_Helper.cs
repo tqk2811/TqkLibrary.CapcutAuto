@@ -33,16 +33,16 @@ namespace TqkLibrary.CapcutAuto.ResourceTracker.Helpers
                                 if (string.IsNullOrWhiteSpace(title) || string.IsNullOrWhiteSpace(resource_id) || !File.Exists(path))
                                     continue;
 
-                                string fileName = $"{resource_id}.json";
-                                string jsonFilePath = Path.Combine(FontsDir, fileName);
-                                if (!File.Exists(jsonFilePath))
+                                string fontFileName = $"{resource_id}.json";
+                                string fontJsonFilePath = Path.Combine(FontsDir, fontFileName);
+                                if (!File.Exists(fontJsonFilePath))
                                 {
                                     string fixPath = "%userprofile%" + path.Replace('\\', '/').Substring(userprofile.Length);
                                     font["path"] = fixPath;
 
-                                    Console.WriteLine($"Write font: {title} ({fileName})");
-                                    string json = JsonConvert.SerializeObject(font, Formatting.Indented);
-                                    await File.WriteAllTextAsync(jsonFilePath, json);
+                                    Console.WriteLine($"Write font: {title} ({fontFileName})");
+                                    string fontJson = JsonConvert.SerializeObject(font, Formatting.Indented);
+                                    await File.WriteAllTextAsync(fontJsonFilePath, fontJson);
                                 }
 
                                 string zipFileName = $"{resource_id}.zip";
@@ -82,11 +82,11 @@ namespace TqkLibrary.CapcutAuto.ResourceTracker.Helpers
                         }
 
                         //int count = Directory.GetFiles(TextsDir).Length;
-                        //string fileName = $"{count:000}.json";
-                        //string jsonFilePath = Path.Combine(TextsDir, fileName);
-                        //Console.WriteLine($"Write text: {fileName}");
-                        //string json = JsonConvert.SerializeObject(text, Formatting.Indented);
-                        //await File.WriteAllTextAsync(jsonFilePath, json);
+                        //string textFileName = $"{count:000}.json";
+                        //string textJsonFilePath = Path.Combine(TextsDir, textFileName);
+                        //Console.WriteLine($"Write text: {textFileName}");
+                        //string textJson = JsonConvert.SerializeObject(text, Formatting.Indented);
+                        //await File.WriteAllTextAsync(textJsonFilePath, textJson);
                     }
                 }
             }
