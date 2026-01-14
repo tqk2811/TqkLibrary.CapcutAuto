@@ -6,7 +6,7 @@
     "RemoteDebug": {
       "commandName": "Project",
       "commandLineArgs": "--draft_content \"C:\\Users\\tqk2811\\AppData\\Local\\CapCut\\User Data\\Projects\\com.lveditor.draft\\myproj\\draft_content.json\"",
-      "workingDirectory": "\\\\TestEmulator\\Csharp\\TqkLibrary.CapcutAuto.ResourceTracker\\RemoteDebug\\net8.0",
+      "workingDirectory": "\\\\TestEmulator\\Csharp\\TqkLibrary.CapcutAuto.ResourceTracker\\RemoteDebug\\net8.0-windows10.0.19041.0",
       "authenticationMode": "Windows",
       "remoteDebugMachine": "TestEmulator:4026",
       "remoteDebugEnabled": true
