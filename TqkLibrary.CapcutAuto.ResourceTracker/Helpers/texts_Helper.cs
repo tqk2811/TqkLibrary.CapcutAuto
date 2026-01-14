@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.IO.Compression;
@@ -51,6 +52,31 @@ namespace TqkLibrary.CapcutAuto.ResourceTracker.Helpers
                                     using FileStream zipToOpen = new FileStream(zipFilePath, FileMode.Create);
                                     using ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Create);
                                     archive.CreateEntryFromFile(path, Path.GetFileName(path));
+                                }
+
+                                string extraInfoFileName = $"{resource_id}.ExtraInfoJson";
+                                string extraInfoFilePath = Path.Combine(FontsDir, extraInfoFileName);
+                                if(!File.Exists(extraInfoFilePath))
+                                {
+                                    JObject extraInfoData = new JObject();
+                                    using (var typeface = SKTypeface.FromFile(path))
+                                    {
+                                        using (var skFont = new SKFont(typeface, 16))
+                                        {
+                                            JArray measuresArray = new JArray();
+                                            foreach (var fontSize in new int[] { 16, 24, 36 })
+                                            {
+                                                JObject measureItem = new JObject();
+                                                measureItem["FontSize"] = fontSize;
+                                                skFont.Size = fontSize;
+                                                measureItem["Spacing"] = skFont.Spacing;
+                                                measuresArray.Add(measureItem);
+                                            }
+                                            extraInfoData["Measures"] = measuresArray;
+                                        }
+                                    }
+                                    string extraInfoJson = JsonConvert.SerializeObject(extraInfoData, Formatting.Indented);
+                                    await File.WriteAllTextAsync(extraInfoFilePath, extraInfoJson);
                                 }
                             }
                         }
