@@ -43,6 +43,9 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Materials
         [JsonConverter(typeof(CapcutPathConverter))]
         public required string FontPath { get; set; }
 
+        [JsonProperty("fonts")]
+        public List<FontResource> Fonts { get; } = new();
+
         public void SetText(string text)
         {
             if (string.IsNullOrWhiteSpace(text)) throw new ArgumentNullException(nameof(text));
@@ -54,7 +57,12 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Materials
             if (size < 8) throw new InvalidOperationException("Font size should larger than 8");
             this.ContentHelper.Styles.First().Size = size;
         }
-
+        public void SetFont(FontResource fontResource)
+        {
+            if (fontResource is null) return;
+            FontPath = fontResource.Path;
+            Fonts.Add(fontResource);
+        }
 
         public static CapcutMaterialText Parse(string json)
         {
