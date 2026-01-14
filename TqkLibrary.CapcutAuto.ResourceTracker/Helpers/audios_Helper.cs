@@ -50,36 +50,39 @@ namespace TqkLibrary.CapcutAuto.ResourceTracker.Helpers
                                 archive.CreateEntryFromFile(path, Path.GetFileName(path));
                             }
 
-                            using (var reader = new AudioFileReader(path))
+                            string extraInfo = $"{music_id}.ExtraInfoJson";
+                            string extraInfoFilePath = Path.Combine(AudiosDir, extraInfo);
+                            if (!File.Exists(extraInfoFilePath))
                             {
-                                float max = 0;
-                                double sumOfSquares = 0;
-                                long samplesRead = 0;
-                                float[] buffer = new float[reader.WaveFormat.SampleRate];
-
-                                int read;
-                                while ((read = reader.Read(buffer, 0, buffer.Length)) > 0)
+                                using (var reader = new AudioFileReader(path))
                                 {
-                                    for (int i = 0; i < read; i++)
+                                    float max = 0;
+                                    double sumOfSquares = 0;
+                                    long samplesRead = 0;
+                                    float[] buffer = new float[reader.WaveFormat.SampleRate];
+
+                                    int read;
+                                    while ((read = reader.Read(buffer, 0, buffer.Length)) > 0)
                                     {
-                                        float sample = Math.Abs(buffer[i]);
-                                        if (sample > max) max = sample;
-                                        sumOfSquares += sample * sample;
-                                        samplesRead++;
+                                        for (int i = 0; i < read; i++)
+                                        {
+                                            float sample = Math.Abs(buffer[i]);
+                                            if (sample > max) max = sample;
+                                            sumOfSquares += sample * sample;
+                                            samplesRead++;
+                                        }
                                     }
+
+                                    double rms = Math.Sqrt(sumOfSquares / samplesRead);
+                                    double maxDb = 20 * Math.Log10(max);
+                                    double avgDb = 20 * Math.Log10(rms);
+
+                                    JObject extraInfoData = new JObject();
+                                    extraInfoData["MaxDb"] = maxDb;
+                                    extraInfoData["AvgDb"] = avgDb;
+                                    string json_extraInfoData = JsonConvert.SerializeObject(extraInfoData, Formatting.Indented);
+                                    await File.WriteAllTextAsync(extraInfoFilePath, json_extraInfoData);
                                 }
-
-                                double rms = Math.Sqrt(sumOfSquares / samplesRead);
-                                double maxDb = 20 * Math.Log10(max);
-                                double avgDb = 20 * Math.Log10(rms);
-
-                                string extraInfo = $"{music_id}.ExtraInfoJson";
-                                string extraInfoFilePath = Path.Combine(AudiosDir, extraInfo);
-                                JObject extraInfoData = new JObject();
-                                extraInfoData["MaxDb"] = maxDb;
-                                extraInfoData["AvgDb"] = avgDb;
-                                string json_extraInfoData = JsonConvert.SerializeObject(extraInfoData, Formatting.Indented);
-                                await File.WriteAllTextAsync(extraInfoFilePath, json_extraInfoData);
                             }
                         }
                     }

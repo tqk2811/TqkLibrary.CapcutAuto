@@ -31,82 +31,85 @@ namespace TqkLibrary.CapcutAuto.ResourceTracker.Helpers
 
                         string extraInfo = $"{resource_id}.ExtraInfoJson";
                         string extraInfoFilePath = Path.Combine(StickersDir, extraInfo);
-                        string heycanInfo_json = Path.Combine(path, "heycanInfo.json");
-                        JObject extraInfoData = new JObject();
-                        if (File.Exists(heycanInfo_json))
+                        if (!File.Exists(extraInfoFilePath))
                         {
-                            string json_heycanInfo_text = await File.ReadAllTextAsync(heycanInfo_json);
-                            JObject data_heycanInfo = (JObject)JsonConvert.DeserializeObject(json_heycanInfo_text)!;
-                            int singleWidth = data_heycanInfo.Value<int>("singleWidth");
-                            int singleHeight = data_heycanInfo.Value<int>("singleHeight");
-                            extraInfoData["Size"] = JToken.FromObject(new Size(singleWidth, singleHeight));
-                        }
-                        else
-                        {
-                            string[] pngFilePaths = Directory.GetFiles(path, "*.png", SearchOption.AllDirectories);
-                            if (pngFilePaths.Length == 0)
+                            string heycanInfo_json = Path.Combine(path, "heycanInfo.json");
+                            JObject extraInfoData = new JObject();
+                            if (File.Exists(heycanInfo_json))
                             {
-                                Console.WriteLine($"Sticker {name}: Not found heycanInfo.json or *.png");
-                                continue;
+                                string json_heycanInfo_text = await File.ReadAllTextAsync(heycanInfo_json);
+                                JObject data_heycanInfo = (JObject)JsonConvert.DeserializeObject(json_heycanInfo_text)!;
+                                int singleWidth = data_heycanInfo.Value<int>("singleWidth");
+                                int singleHeight = data_heycanInfo.Value<int>("singleHeight");
+                                extraInfoData["Size"] = JToken.FromObject(new Size(singleWidth, singleHeight));
                             }
-                            else if (pngFilePaths.Length == 1)
+                            else
                             {
-                                FileInfo fileInfo_png = new FileInfo(pngFilePaths[0]);
-                                string png_json_path = Path.Combine(fileInfo_png.Directory!.FullName, $"{Path.GetFileNameWithoutExtension(pngFilePaths[0])}.json");
-                                if (File.Exists(png_json_path))
+                                string[] pngFilePaths = Directory.GetFiles(path, "*.png", SearchOption.AllDirectories);
+                                if (pngFilePaths.Length == 0)
                                 {
-                                    string json_png_text = await File.ReadAllTextAsync(png_json_path);
-                                    JObject data_png = (JObject)JsonConvert.DeserializeObject(json_png_text)!;
-                                    var frames = data_png["frames"];
-                                    if (frames?.Type == JTokenType.Array)
+                                    Console.WriteLine($"Sticker {name}: Not found heycanInfo.json or *.png");
+                                    continue;
+                                }
+                                else if (pngFilePaths.Length == 1)
+                                {
+                                    FileInfo fileInfo_png = new FileInfo(pngFilePaths[0]);
+                                    string png_json_path = Path.Combine(fileInfo_png.Directory!.FullName, $"{Path.GetFileNameWithoutExtension(pngFilePaths[0])}.json");
+                                    if (File.Exists(png_json_path))
                                     {
-                                        var frame = frames.First?["frame"];
-                                        if (frame is not null)
+                                        string json_png_text = await File.ReadAllTextAsync(png_json_path);
+                                        JObject data_png = (JObject)JsonConvert.DeserializeObject(json_png_text)!;
+                                        var frames = data_png["frames"];
+                                        if (frames?.Type == JTokenType.Array)
                                         {
-                                            double w = frame.Value<double>("w");
-                                            double h = frame.Value<double>("h");
-                                            extraInfoData.Size = new Size((int)w, (int)h);
+                                            var frame = frames.First?["frame"];
+                                            if (frame is not null)
+                                            {
+                                                double w = frame.Value<double>("w");
+                                                double h = frame.Value<double>("h");
+                                                extraInfoData["Size"] = JToken.FromObject(new Size((int)w, (int)h));
+                                            }
+                                            else
+                                            {
+                                                Console.WriteLine($"not found frame");
+                                                continue;
+                                            }
                                         }
                                         else
                                         {
-                                            Console.WriteLine($"not found frame");
+                                            Console.WriteLine($"not found frames");
                                             continue;
                                         }
                                     }
                                     else
                                     {
-                                        Console.WriteLine($"not found frames");
-                                        continue;
+                                        using Image bitmap = Bitmap.FromFile(pngFilePaths[0]);
+                                        extraInfoData["Size"] = JToken.FromObject(bitmap.Size);
                                     }
                                 }
                                 else
                                 {
-                                    using Image bitmap = Bitmap.FromFile(pngFilePaths[0]);
-                                    extraInfoData["Size"] = JToken.FromObject(bitmap.Size);
+                                    Console.WriteLine($"Sticker {name}: Not found heycanInfo.json, found many *.png");
+                                    continue;
+                                    //List<Size> sizes = new List<Size>();
+                                    //foreach (var pngFilePath in pngFilePaths)
+                                    //{
+                                    //    using Image bitmap = Bitmap.FromFile(pngFilePath);
+                                    //    sizes.Add(bitmap.Size);
+                                    //}
+                                    //if(sizes.Distinct().Count() == 1)
+                                    //{
+                                    //    extraInfoData.Size = sizes.First();
+                                    //}
+                                    //else
+                                    //{
+                                    //    Console.WriteLine();
+                                    //}
                                 }
                             }
-                            else
-                            {
-                                Console.WriteLine($"Sticker {name}: Not found heycanInfo.json, found many *.png");
-                                continue;
-                                //List<Size> sizes = new List<Size>();
-                                //foreach (var pngFilePath in pngFilePaths)
-                                //{
-                                //    using Image bitmap = Bitmap.FromFile(pngFilePath);
-                                //    sizes.Add(bitmap.Size);
-                                //}
-                                //if(sizes.Distinct().Count() == 1)
-                                //{
-                                //    extraInfoData.Size = sizes.First();
-                                //}
-                                //else
-                                //{
-                                //    Console.WriteLine();
-                                //}
-                            }
+                            string extraInfoJson = JsonConvert.SerializeObject(extraInfoData, Formatting.Indented);
+                            await File.WriteAllTextAsync(extraInfoFilePath, extraInfoJson);
                         }
-                        string extraInfoJson = JsonConvert.SerializeObject(extraInfoData, Formatting.Indented);
-                        await File.WriteAllTextAsync(extraInfoFilePath, extraInfoJson);
 
 
                         string fileName = $"{resource_id}.json";
