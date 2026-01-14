@@ -12,12 +12,7 @@ namespace TqkLibrary.CapcutAuto.ResourceTracker.Helpers
 {
     internal class stickers_Hepler : BaseHelper
     {
-        public override Task ParseAsync(JObject data)
-        {
-            return Task.Run(() => _ParseAsync(data));
-        }
-
-        async Task _ParseAsync(JObject data)
+        protected override async Task _ParseAsync(JObject data)
         {
             var materials = data["materials"];
             if (materials is not null)

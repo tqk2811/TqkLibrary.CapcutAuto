@@ -8,7 +8,7 @@ using TqkLibrary.Linq;
 
 Console.OutputEncoding = Encoding.UTF8;
 
-#if DEBUG
+#if DEBUG && !REMOTEDEBUG
 await RunAsync(Path.Combine(AppContext.BaseDirectory, "draft_content.json"));
 #endif
 

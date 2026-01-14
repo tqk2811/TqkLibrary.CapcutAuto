@@ -77,6 +77,12 @@ namespace TqkLibrary.CapcutAuto.ResourceTracker.Helpers
         }
 
 
-        public abstract Task ParseAsync(JObject data);
+        public Task ParseAsync(JObject data)
+        {
+            return Task.Run(() => _ParseAsync(data));
+        }
+
+        protected abstract Task _ParseAsync(JObject data);
+
     }
 }

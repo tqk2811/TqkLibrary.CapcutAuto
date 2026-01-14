@@ -15,13 +15,10 @@ namespace TqkLibrary.CapcutAuto.ResourceTracker.Helpers
         readonly List<string> textMaterialIds = new();
         readonly List<string> stickerMaterialIds = new();
 
-        public override Task ParseAsync(JObject data)
+        protected override async Task _ParseAsync(JObject data)
         {
-            return Task.Run(async () =>
-            {
-                ParseTrack(data);
-                await Parse_material_animations_Async(data);
-            });
+            ParseTrack(data);
+            await Parse_material_animations_Async(data);
         }
 
         void ParseTrack(JObject data)
