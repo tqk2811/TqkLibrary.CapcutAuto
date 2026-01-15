@@ -110,6 +110,10 @@ async Task RunAsync(string draftContentFilePath)
     track_Helper track_Helper = new();
     await track_Helper.ParseAsync(data);
 
+    effects_Helper effects_Helper = new();
+    await effects_Helper.ParseAsync(data);
+
+
     List<Task> tasks = new();
     material_animations_Helper material_Animations = new(track_Helper);
     tasks.Add(material_Animations.ParseAsync(data));
@@ -117,16 +121,13 @@ async Task RunAsync(string draftContentFilePath)
     transitions_Helper transitions_Helper = new();
     tasks.Add(transitions_Helper.ParseAsync(data));
 
-    effects_Helper effects_Helper = new();
-    tasks.Add(effects_Helper.ParseAsync(data));
-
     stickers_Hepler stickers_Hepler = new();
     tasks.Add(stickers_Hepler.ParseAsync(data));
 
     audios_Helper audios_Helper = new();
     tasks.Add(audios_Helper.ParseAsync(data));
 
-    texts_Helper texts_Helper = new();
+    texts_Helper texts_Helper = new(track_Helper, effects_Helper);
     tasks.Add(texts_Helper.ParseAsync(data));
 
     await Task.WhenAll(tasks);

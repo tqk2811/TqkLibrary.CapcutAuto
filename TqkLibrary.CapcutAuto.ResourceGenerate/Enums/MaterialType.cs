@@ -17,5 +17,6 @@
         canvas_color,
         text_shape,
         sticker,
+        bloom,
     }
 }

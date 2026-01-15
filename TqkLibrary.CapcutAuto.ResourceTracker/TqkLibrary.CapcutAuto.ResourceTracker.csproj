@@ -24,4 +24,8 @@
 		<PackageReference Include="TqkLibrary.Linq" Version="1.0.0-build20251205144537" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\TqkLibrary.CapcutAuto.ResourceGenerate\TqkLibrary.CapcutAuto.ResourceGenerate.csproj" />
+	</ItemGroup>
+
 </Project>
