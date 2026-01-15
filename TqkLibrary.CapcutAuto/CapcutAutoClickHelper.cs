@@ -48,7 +48,7 @@ namespace TqkLibrary.CapcutAuto
             while (true)
             {
                 var processes = Process.GetProcessesByName("Capcut").Concat(Process.GetProcessesByName("VEDetector")).ToArray();
-                if (processes.Any())
+                if (!processes.Any())
                     break;
                 foreach (var process in processes)
                 {
