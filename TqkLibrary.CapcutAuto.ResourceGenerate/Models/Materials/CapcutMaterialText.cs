@@ -16,6 +16,11 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Materials
         [JsonIgnore]
         public _ContentHelper ContentHelper { get; set; } = new _ContentHelper();
 
+        [JsonProperty("font_source_platform")]
+        public int FontSourcePlatform { get; set; } = 0;
+
+        [JsonProperty("font_resource_id")]
+        public string FontResourceId { get; set; } = string.Empty;
 
 
         [JsonProperty("add_type")]
@@ -61,7 +66,18 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Materials
         {
             if (fontResource is null) return;
             FontPath = fontResource.Path;
+            FontSourcePlatform = 1;
+            FontResourceId = fontResource.ResourceId;
+            Fonts.Clear();
             Fonts.Add(fontResource);
+            foreach (var item in ContentHelper.Styles)
+            {
+                if (item.Font is not null)
+                {
+                    item.Font.Path = fontResource.Path;
+                    item.Font.Id = fontResource.ResourceId;
+                }
+            }
         }
 
         public static CapcutMaterialText Parse(string json)
@@ -85,17 +101,20 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Materials
 
             public class _Style
             {
-                //[JsonProperty("fill")]
-                //public required _Fill Fill { get; set; }
+                [JsonProperty("fill")]
+                public required _Fill Fill { get; set; }
 
-                //[JsonProperty("font")]
-                //public required _Font Font { get; set; }
+                [JsonProperty("font")]
+                public required _Font Font { get; set; }
 
                 [JsonProperty("size")]
                 public required double Size { get; set; }
 
-                //[JsonProperty("effectStyle")]
-                //public required _EffectStyle EffectStyle { get; set; }
+                [JsonProperty("effectStyle")]
+                public _EffectStyle? EffectStyle { get; set; }
+
+                [JsonProperty("strokes")]
+                public List<_Fill>? Strokes { get; set; }
 
                 [JsonProperty("range")]
                 public required List<int> Range { get; set; }
@@ -120,6 +139,9 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Materials
             }
             public class _Fill
             {
+                [JsonProperty("alpha")]
+                public double? Alpha { get; set; }
+
                 [JsonProperty("content")]
                 public required _Content Content { get; set; }
             }
@@ -130,6 +152,9 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Materials
 
                 [JsonProperty("render_type")]
                 public required string RenderType { get; set; }
+
+                [JsonProperty("solid")]
+                public _Solid? Solid { get; set; }
             }
             public class _Texture
             {
@@ -138,6 +163,14 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Materials
 
                 [JsonProperty("path")]
                 public required string Path { get; set; }
+            }
+            public class _Solid
+            {
+                [JsonProperty("alpha")]
+                public double? Alpha { get; set; }
+
+                [JsonProperty("color")]
+                public required List<int> Color { get; set; }
             }
         }
     }

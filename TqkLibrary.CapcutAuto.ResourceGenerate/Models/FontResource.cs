@@ -22,7 +22,9 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models
         [JsonProperty("path")]
         [JsonConverter(typeof(CapcutPathConverter))]
         public required string Path { get; set; }
-
+        
+        [JsonProperty("resource_id")]
+        public required string ResourceId { get; init; }
 
         public static FontResource Parse(string json)
         {
