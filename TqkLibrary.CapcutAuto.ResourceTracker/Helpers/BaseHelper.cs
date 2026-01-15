@@ -17,6 +17,7 @@ namespace TqkLibrary.CapcutAuto.ResourceTracker.Helpers
         protected static readonly string EffectsDir;
         protected static readonly string TextEffectsDir;
         protected static readonly string TextShapesDir;
+        protected static readonly string TextBloomDir;
         protected static readonly string StickersDir;
         protected static readonly string TextsDir;
         protected static readonly string AudiosDir;
@@ -62,6 +63,9 @@ namespace TqkLibrary.CapcutAuto.ResourceTracker.Helpers
 
             TextShapesDir = Path.Combine(EffectsDir, "TextShapes");
             Directory.CreateDirectory(TextShapesDir);
+
+            TextBloomDir = Path.Combine(EffectsDir, "TextBlooms");
+            Directory.CreateDirectory(TextBloomDir);
 
             StickersDir = Path.Combine(CapcutDatasDir, "Stickers");
             Directory.CreateDirectory(StickersDir);

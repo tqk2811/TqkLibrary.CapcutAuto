@@ -7,11 +7,21 @@ using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TqkLibrary.CapcutAuto.ResourceGenerate.Enums;
 
 namespace TqkLibrary.CapcutAuto.ResourceTracker.Helpers
 {
     internal class texts_Helper : BaseHelper
     {
+        private track_Helper _track_Helper;
+        private effects_Helper _effects_Helper;
+
+        public texts_Helper(track_Helper track_Helper, effects_Helper effects_Helper)
+        {
+            this._track_Helper = track_Helper;
+            this._effects_Helper = effects_Helper;
+        }
+
         protected override async Task _ParseAsync(JObject data)
         {
             var materials = data["materials"];
@@ -56,7 +66,7 @@ namespace TqkLibrary.CapcutAuto.ResourceTracker.Helpers
 
                                 string extraInfoFileName = $"{resource_id}.ExtraInfoJson";
                                 string extraInfoFilePath = Path.Combine(FontsDir, extraInfoFileName);
-                                if(!File.Exists(extraInfoFilePath))
+                                if (!File.Exists(extraInfoFilePath))
                                 {
                                     JObject extraInfoData = new JObject();
                                     using (var typeface = SKTypeface.FromFile(path))
@@ -81,15 +91,55 @@ namespace TqkLibrary.CapcutAuto.ResourceTracker.Helpers
                             }
                         }
 
-                        //int count = Directory.GetFiles(TextsDir).Length;
-                        //string textFileName = $"{count:000}.json";
-                        //string textJsonFilePath = Path.Combine(TextsDir, textFileName);
-                        //Console.WriteLine($"Write text: {textFileName}");
-                        //string textJson = JsonConvert.SerializeObject(text, Formatting.Indented);
-                        //await File.WriteAllTextAsync(textJsonFilePath, textJson);
+                        string id = text.Value<string>("id")!;
+
+                        int count = Directory.GetFiles(TextsDir, "*.json").Length;
+
+                        string textFileName = $"{count:000}.json";
+                        string textJsonFilePath = Path.Combine(TextsDir, textFileName);
+                        Console.WriteLine($"Write text: {textFileName}");
+                        string textJson = JsonConvert.SerializeObject(text, Formatting.Indented);
+                        await File.WriteAllTextAsync(textJsonFilePath, textJson);
+
+                        string? bloomId = null;
+                        if (_track_Helper.TextExtraMaterialRefIds.ContainsKey(id))
+                        {
+                            foreach (var pair_id_resourceId in _effects_Helper.Effect_Blooms)
+                            {
+                                if (_track_Helper.TextExtraMaterialRefIds[id].Contains(pair_id_resourceId.Key))
+                                {
+                                    bloomId = pair_id_resourceId.Value;
+                                    break;
+                                }
+                            }
+                        }
+                        if (!string.IsNullOrWhiteSpace(bloomId))
+                        {
+                            string LinkedResourcesJsonFileName = $"{count:000}.LinkedResourcesJson";
+                            string textLinkedResourcesJsonFilePath = Path.Combine(TextsDir, LinkedResourcesJsonFileName);
+                            if (!File.Exists(textLinkedResourcesJsonFilePath))
+                            {
+                                Console.WriteLine($"Write text linked resources: {LinkedResourcesJsonFileName}");
+                                LinkedResourceItem linkedResourceItem = new LinkedResourceItem()
+                                {
+                                    Id = bloomId,
+                                    Type = MaterialType.bloom
+                                };
+
+                                string textLinkedResourcesJson = JsonConvert.SerializeObject(new List<LinkedResourceItem>() { linkedResourceItem }, Formatting.Indented);
+                                await File.WriteAllTextAsync(textLinkedResourcesJsonFilePath, textLinkedResourcesJson);
+                            }
+                        }
                     }
                 }
             }
+        }
+
+
+        class LinkedResourceItem
+        {
+            public required MaterialType Type { get; set; }
+            public required string Id { get; set; }
         }
     }
 }
