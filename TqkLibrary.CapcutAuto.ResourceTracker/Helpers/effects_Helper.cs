@@ -11,6 +11,10 @@ namespace TqkLibrary.CapcutAuto.ResourceTracker.Helpers
 {
     internal class effects_Helper : BaseHelper
     {
+        readonly Dictionary<string, string> _effect_blooms = new();
+        //id : resource_id
+        public IReadOnlyDictionary<string, string> Effect_Blooms => _effect_blooms;
+
         protected override async Task _ParseAsync(JObject data)
         {
             var materials = data["materials"];
@@ -24,6 +28,7 @@ namespace TqkLibrary.CapcutAuto.ResourceTracker.Helpers
                         string? type = effect.Value<string>("type");
                         string? path = effect.Value<string>("path");
                         string? name = effect.Value<string>("name");
+                        string? id = effect.Value<string>("id");
                         string? resource_id = effect.Value<string>("resource_id");
                         if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(resource_id) || !Directory.Exists(path))
                             continue;
@@ -32,12 +37,22 @@ namespace TqkLibrary.CapcutAuto.ResourceTracker.Helpers
                         {
                             "text_effect" => TextEffectsDir,
                             "text_shape" => TextShapesDir,
+                            "bloom" => TextBloomDir,
                             _ => null,
                         };
                         if (string.IsNullOrWhiteSpace(dir))
                         {
                             Console.WriteLine($"Not support materials effects type: {type}");
                             continue;
+                        }
+                        switch (type)
+                        {
+                            case "bloom":
+                                if (!string.IsNullOrWhiteSpace(id))
+                                {
+                                    _effect_blooms[id] = resource_id;
+                                }
+                                break;
                         }
 
                         string fileName = $"{resource_id}.json";
