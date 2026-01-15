@@ -11,56 +11,12 @@ namespace TqkLibrary.CapcutAuto.ResourceTracker.Helpers
 {
     internal class material_animations_Helper : BaseHelper
     {
-        readonly List<string> videoMaterialIds = new();
-        readonly List<string> textMaterialIds = new();
-        readonly List<string> stickerMaterialIds = new();
-
+        readonly track_Helper _track_Helper;
+        public material_animations_Helper(track_Helper track_Helper)
+        {
+            this._track_Helper = track_Helper;
+        }
         protected override async Task _ParseAsync(JObject data)
-        {
-            ParseTrack(data);
-            await Parse_material_animations_Async(data);
-        }
-
-        void ParseTrack(JObject data)
-        {
-            var tracks = data["tracks"];
-            if (tracks?.Type == JTokenType.Array)
-            {
-                foreach (var track in tracks)
-                {
-                    string? type = track.Value<string>("type");
-                    if (string.IsNullOrWhiteSpace(type))
-                        continue;
-
-                    List<string>? materialIds = type switch
-                    {
-                        "video" => videoMaterialIds,
-                        "text" => textMaterialIds,
-                        "sticker" => stickerMaterialIds,
-                        _ => null
-                    };
-                    if (materialIds is null)
-                        continue;
-
-                    var segments = track["segments"];
-                    if (segments?.Type == JTokenType.Array)
-                    {
-                        foreach (var segment in segments)
-                        {
-                            var extra_material_refs = segment["extra_material_refs"];
-                            if (extra_material_refs?.Type == JTokenType.Array)
-                            {
-                                foreach (var extra_material_ref in extra_material_refs)
-                                {
-                                    materialIds.Add(extra_material_ref.ToString());
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        async Task Parse_material_animations_Async(JObject data)
         {
             var materials = data["materials"];
             if (materials is not null)
@@ -78,15 +34,15 @@ namespace TqkLibrary.CapcutAuto.ResourceTracker.Helpers
                             continue;
 
                         string dirName;
-                        if (videoMaterialIds.Contains(id, StringComparer.OrdinalIgnoreCase))
+                        if (_track_Helper.VideoExtraMaterialRefIds.Values.SelectMany(x => x).Contains(id, StringComparer.OrdinalIgnoreCase))
                         {
                             dirName = "Videos";
                         }
-                        else if (textMaterialIds.Contains(id, StringComparer.OrdinalIgnoreCase))
+                        else if (_track_Helper.TextExtraMaterialRefIds.Values.SelectMany(x => x).Contains(id, StringComparer.OrdinalIgnoreCase))
                         {
                             dirName = "Texts";
                         }
-                        else if (stickerMaterialIds.Contains(id, StringComparer.OrdinalIgnoreCase))
+                        else if (_track_Helper.StickerExtraMaterialRefIds.Values.SelectMany(x => x).Contains(id, StringComparer.OrdinalIgnoreCase))
                         {
                             dirName = "Stickers";
                         }

@@ -107,8 +107,11 @@ async Task RunAsync(string draftContentFilePath)
     string json_text = await File.ReadAllTextAsync(draftContentFilePath);
     JObject data = (JObject)JsonConvert.DeserializeObject(json_text)!;
 
+    track_Helper track_Helper = new();
+    await track_Helper.ParseAsync(data);
+
     List<Task> tasks = new();
-    material_animations_Helper material_Animations = new();
+    material_animations_Helper material_Animations = new(track_Helper);
     tasks.Add(material_Animations.ParseAsync(data));
 
     transitions_Helper transitions_Helper = new();
