@@ -16,7 +16,8 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Tracks.Segments
         public SegmentClip Clip { get; init; } = new();
 
 
-
+        [JsonIgnore]
+        public CapcutMaterialEffectBloom? MaterialEffectBloom { get; set; }
 
         [JsonIgnore]
         public CapcutMaterialAnimationText MaterialAnimation { get; set; } = new();
@@ -32,6 +33,8 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Tracks.Segments
         {
             get
             {
+                if(MaterialEffectBloom is not null)
+                    yield return MaterialEffectBloom;
                 if (MaterialEffectTextEffect is not null)
                     yield return MaterialEffectTextEffect;
                 if (MaterialEffectTextShape is not null)
@@ -47,6 +50,7 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Tracks.Segments
                  MaterialAnimation,//animation
                  MaterialEffectTextEffect,//effect
                  MaterialEffectTextShape,//effect
+                 MaterialEffectBloom,
             };
             foreach (CapcutId capcutId in capcutIds.Where(x => x is not null)!)
             {
