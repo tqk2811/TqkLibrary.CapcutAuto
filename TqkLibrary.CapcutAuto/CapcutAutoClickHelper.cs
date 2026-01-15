@@ -47,8 +47,8 @@ namespace TqkLibrary.CapcutAuto
             using CancellationTokenSource timeout = new CancellationTokenSource(WaitCloseProcessTimeout);
             while (true)
             {
-                var processes = Process.GetProcessesByName("Capcut");
-                if (!processes.Any())
+                var processes = Process.GetProcessesByName("Capcut").Concat(Process.GetProcessesByName("VEDetector")).ToArray();
+                if (processes.Any())
                     break;
                 foreach (var process in processes)
                 {
