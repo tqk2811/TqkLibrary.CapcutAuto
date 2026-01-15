@@ -102,7 +102,21 @@ namespace TqkLibrary.CapcutAuto
             using CancellationTokenSource timeout = new CancellationTokenSource(WaitWindowTimeout);
             while (true)
             {
-                child = processHelper.ChildrensProcess.FirstOrDefault();//Apps\7.7.0.3143\CapCut.exe
+                foreach (var item in processHelper.ChildrensProcess)//Apps\7.7.0.3143\CapCut.exe or VEDetector.exe
+                {
+                    if (item.Name.StartsWith("VEDetector"))
+                    {
+                        foreach (var window in item.WindowsTree)
+                        {
+                            window.SendMessage(PInvoke.WM_CLOSE, UIntPtr.Zero, IntPtr.Zero);
+                        }
+                    }
+                    else if (item.Name.StartsWith("CapCut"))
+                    {
+                        child = item;
+                        break;
+                    }
+                }
                 if (child is not null)
                     break;
                 await Task.Delay(10, cancellationToken);
