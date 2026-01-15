@@ -170,7 +170,7 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Materials
                 public double? Alpha { get; set; }
 
                 [JsonProperty("color")]
-                public required List<int> Color { get; set; }
+                public required List<double> Color { get; set; }
             }
         }
     }
