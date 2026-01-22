@@ -1,7 +1,6 @@
 <Project>
 	<PropertyGroup>
 		<TargetFrameworks>net8.0</TargetFrameworks>
-		<LangVersion>14.0</LangVersion>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<PreserveCompilationContext>false</PreserveCompilationContext>
