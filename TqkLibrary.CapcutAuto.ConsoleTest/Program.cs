@@ -12,9 +12,9 @@ CapcutAutoClickHelper capcutAutoClickHelper = new CapcutAutoClickHelper();
 try
 {
     await capcutAutoClickHelper.OpenCapcutAsync();
-    //await capcutAutoClickHelper.ClickProjectWhiteCoverAsync();
+    await capcutAutoClickHelper.ClickProjectWhiteCoverAsync();
     await capcutAutoClickHelper.ClickExportAsync();
-    await capcutAutoClickHelper.ExportAsync();
+    await capcutAutoClickHelper.ExportRenderAsync();
 }
 finally
 {

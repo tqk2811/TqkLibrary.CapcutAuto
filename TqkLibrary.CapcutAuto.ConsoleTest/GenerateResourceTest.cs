@@ -61,7 +61,11 @@ namespace TqkLibrary.CapcutAuto.ConsoleTest
                         Start = TimeSpan.Zero,
                         Duration = TimeSpan.FromSeconds(5),
                     },
-                    Speed = 1.0,
+                    SourceTimerange = new()
+                    {
+                        Start = TimeSpan.Zero,
+                        Duration = TimeSpan.FromSeconds(5),
+                    },
                     Volume = 0.0,
                     MaterialTransition = capcutMaterialTransitions[Random.Shared.Next(capcutMaterialTransitions.Count)]
                         .CloneWithRandomId()
@@ -72,10 +76,14 @@ namespace TqkLibrary.CapcutAuto.ConsoleTest
                     MaterialVideo = materialVideo.CreateMaterial(),
                     TargetTimerange = new()
                     {
+                        Start = TimeSpan.FromSeconds(5),
+                        Duration = TimeSpan.FromSeconds(5),
+                    },
+                    SourceTimerange = new()
+                    {
                         Start = TimeSpan.FromSeconds(25),
                         Duration = TimeSpan.FromSeconds(5),
                     },
-                    Speed = 1.0,
                     Volume = 0.0,
                     MaterialTransition = capcutMaterialTransitions[Random.Shared.Next(capcutMaterialTransitions.Count)]
                         .CloneWithRandomId()
@@ -86,10 +94,14 @@ namespace TqkLibrary.CapcutAuto.ConsoleTest
                     MaterialVideo = materialVideo.CreateMaterial(),
                     TargetTimerange = new()
                     {
-                        Start = TimeSpan.FromSeconds(45),
+                        Start = TimeSpan.FromSeconds(10),
                         Duration =TimeSpan.FromSeconds(5),
                     },
-                    Speed = 1.0,
+                    SourceTimerange = new()
+                    {
+                        Start = TimeSpan.FromSeconds(45),
+                        Duration = TimeSpan.FromSeconds(5),
+                    },
                     Volume = 0.0,
                 },
             });
@@ -103,8 +115,12 @@ namespace TqkLibrary.CapcutAuto.ConsoleTest
                         Start = TimeSpan.Zero,
                         Duration = materialAudio.Duration,
                     },
+                    SourceTimerange = new()
+                    {
+                        Start = TimeSpan.Zero,
+                        Duration = materialAudio.Duration,
+                    },
                     Volume = 1.0,
-                    Speed = 1.0,
                 }
             });
 
