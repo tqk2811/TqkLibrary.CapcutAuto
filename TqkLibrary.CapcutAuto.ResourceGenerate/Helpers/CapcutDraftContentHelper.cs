@@ -57,7 +57,7 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Helpers
             var materials_texts = textSegments.Select(x => x.MaterialText).Where(x => x is not null).ToArray();
             var materials_effects = textSegments.SelectMany(x => x.CapcutMaterialEffects).Where(x => x is not null).ToArray();
             _jobject["materials"]!["texts"] = JArray.FromObject(materials_texts, _jsonSerializer);
-            _jobject["materials"]!["effects"] = JArray.FromObject(materials_effects);
+            _jobject["materials"]!["effects"] = JArray.FromObject(materials_effects, _jsonSerializer);
 
             var videoSegments = CapcutTracks
                 .OfType<CapcutTrackVideo>()

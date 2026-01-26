@@ -2,6 +2,11 @@
 
 	<Import Project="..\ProjectBuildProperties.targets" />
 
+	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
+		<Deterministic>true</Deterministic>
+		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<EmbeddedResource Include="EmbeddedResources\**\*.*" />
 	</ItemGroup>
