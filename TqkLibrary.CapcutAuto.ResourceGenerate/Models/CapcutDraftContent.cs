@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Drawing;
 
 namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models
 {
@@ -11,6 +12,28 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models
         {
             this._jobject = jobject ?? throw new ArgumentNullException(nameof(jobject));
             this._jsonSerializer = JsonSerializer.Create(Singleton.JsonSerializerSettings);
+        }
+
+        public Size? CanvasSize
+        {
+            get
+            {
+                var config = _jobject["canvas_config"];
+                if (config == null) return null;
+
+                int width = config["width"]!.Value<int>();
+                int height = config["height"]!.Value<int>();
+
+                return new Size(width, height);
+            }
+            set
+            {
+                if (value.HasValue && _jobject["canvas_config"] is JObject config)
+                {
+                    config["width"] = value.Value.Width;
+                    config["height"] = value.Value.Height;
+                }
+            }
         }
 
         public TimeSpan Duration
