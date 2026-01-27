@@ -14,12 +14,12 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models
             this._jsonSerializer = JsonSerializer.Create(Singleton.JsonSerializerSettings);
         }
 
-        public Size? CanvasSize
+        public Size CanvasSize
         {
             get
             {
                 var config = _jobject["canvas_config"];
-                if (config == null) return null;
+                if (config == null) throw new InvalidOperationException("canvas_config not found");
 
                 int width = config["width"]!.Value<int>();
                 int height = config["height"]!.Value<int>();
@@ -28,10 +28,10 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models
             }
             set
             {
-                if (value.HasValue && _jobject["canvas_config"] is JObject config)
+                if (_jobject["canvas_config"] is JObject config)
                 {
-                    config["width"] = value.Value.Width;
-                    config["height"] = value.Value.Height;
+                    config["width"] = value.Width;
+                    config["height"] = value.Height;
                 }
             }
         }
