@@ -104,6 +104,7 @@ async void Timer_Elapsed(object? sender, ElapsedEventArgs e)
 }
 async Task RunAsync(string draftContentFilePath)
 {
+    Console.WriteLine("Read start");
     string json_text = await File.ReadAllTextAsync(draftContentFilePath);
     JObject data = (JObject)JsonConvert.DeserializeObject(json_text)!;
 
@@ -131,4 +132,6 @@ async Task RunAsync(string draftContentFilePath)
     tasks.Add(texts_Helper.ParseAsync(data));
 
     await Task.WhenAll(tasks);
+    Console.WriteLine("Read done");
+    Console.WriteLine();
 }
