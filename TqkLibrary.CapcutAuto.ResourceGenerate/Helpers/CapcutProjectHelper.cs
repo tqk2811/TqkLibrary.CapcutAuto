@@ -82,6 +82,38 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Helpers
             draftMaterial.Value.Add(value);
             return value;
         }
+        public async Task<DraftMetaInfo.DraftMaterialValuePhoto> AddPhotoFileAsync(string photoFilePath, CancellationToken cancellationToken = default)
+        {
+            FileInfo fileInfo = new(photoFilePath);
+            if (!fileInfo.Exists)
+                throw new FileNotFoundException(photoFilePath);
+
+            var draftMaterial = _draftMetaInfo.DraftMaterials.First(x => x.Type == 0);
+            if (draftMaterial.Value.Any(x => x.FilePath.Equals(fileInfo.FullName, StringComparison.OrdinalIgnoreCase)))
+            {
+                throw new Exception("Dupp file input");
+            }
+
+            IMediaAnalysis mediaAnalysis = await FFProbe.AnalyseAsync(photoFilePath, cancellationToken: cancellationToken);
+            if (mediaAnalysis.PrimaryVideoStream is null)
+                throw new InvalidOperationException($"File had no VideoStream");
+
+            DraftMetaInfo.DraftMaterialValuePhoto value = new()
+            {
+                ExtraInfo = fileInfo.Name,
+                FilePath = fileInfo.FullName,
+                Height = mediaAnalysis.PrimaryVideoStream.Height,
+                Width = mediaAnalysis.PrimaryVideoStream.Width,
+                RoughcutTimeRange = new()
+                {
+                    Duration = TimeSpan.FromMicroseconds(-1),
+                    Start = TimeSpan.FromMicroseconds(-1),
+                },
+                Duration = TimeSpan.FromMicroseconds(10800000000),
+            };
+            draftMaterial.Value.Add(value);
+            return value;
+        }
         public async Task<DraftMetaInfo.DraftMaterialValueAudio> AddAudioFileAsync(string audioFilePath, CancellationToken cancellationToken = default)
         {
             FileInfo fileInfo = new(audioFilePath);
