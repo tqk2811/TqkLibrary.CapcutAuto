@@ -62,8 +62,8 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Helpers
             var videoSegments = CapcutTracks
                 .OfType<CapcutTrackVideo>()
                 .SelectMany(x => x.Segments)
-                .OfType<CapcutSegmentVideo>();
-            var materials_videos = videoSegments.Select(x => x.MaterialVideo).Where(x => x is not null).ToArray();
+                .OfType<CapcutSegmentVideoBase>();
+            var materials_videos = videoSegments.Select(x => x.MaterialVideoBase).Where(x => x is not null).ToArray();
             var materials_v_transitions = videoSegments.Select(x => x.MaterialTransition).Where(x => x is not null).ToArray();
             var materials_v_canvases = videoSegments.Select(x => x.MaterialCanvasColor).Where(x => x is not null).ToArray();
             var materials_v_colors = videoSegments.Select(x => x.MaterialColor).Where(x => x is not null).ToArray();

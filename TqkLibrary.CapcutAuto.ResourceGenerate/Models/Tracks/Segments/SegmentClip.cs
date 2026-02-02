@@ -42,7 +42,7 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Tracks.Segments
         /// trục x tăng qua phải, giới hạn -1 tới 1<br/>
         /// trục y tăng lên trên, giới hạn -1 tới 1<br/>
         /// gốc nằm giữa vật thể<br/>
-        /// dùng cho <see cref="CapcutSegmentText"/> và <see cref="CapcutSegmentVideo"/><br/>
+        /// dùng cho <see cref="CapcutSegmentText"/> và <see cref="CapcutSegmentVideoBase"/><br/>
         /// </summary>
         public class _Transform
         {

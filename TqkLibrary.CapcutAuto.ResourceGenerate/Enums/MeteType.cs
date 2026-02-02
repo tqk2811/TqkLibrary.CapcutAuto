@@ -10,5 +10,6 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Enums
     {
         video,
         music,
+        photo,
     }
 }

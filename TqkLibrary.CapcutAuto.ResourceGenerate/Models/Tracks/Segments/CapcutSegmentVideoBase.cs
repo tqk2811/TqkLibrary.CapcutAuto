@@ -3,15 +3,10 @@ using TqkLibrary.CapcutAuto.ResourceGenerate.Models.Materials;
 
 namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Tracks.Segments
 {
-    public sealed class CapcutSegmentVideo : CapcutSegment
+    public abstract class CapcutSegmentVideoBase : CapcutSegment
     {
         [JsonIgnore]
-        public required CapcutMaterialVideo MaterialVideo { get; set; }
-        protected override CapcutId GetMaterial()
-        {
-            return MaterialVideo;
-        }
-
+        public abstract CapcutMaterialVideoBase MaterialVideoBase { get; }
 
         public required override CapcutTimeRange SourceTimerange { get; set; }//video, audio ; sticker, text is null
 

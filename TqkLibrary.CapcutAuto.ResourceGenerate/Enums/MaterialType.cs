@@ -18,5 +18,6 @@
         text_shape,
         sticker,
         bloom,
+        photo,
     }
 }

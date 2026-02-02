@@ -10,6 +10,6 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Tracks
             this.Type = TrackType.video;
         }
 
-        public void Add(CapcutSegmentVideo capcutSegmentVideo) => _segments.Add(capcutSegmentVideo);
+        public void Add(CapcutSegmentVideoBase capcutSegmentVideoBase) => _segments.Add(capcutSegmentVideoBase);
     }
 }

@@ -127,7 +127,30 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models
             [JsonIgnore]
             internal bool HasAudio { get; init; }
 
-            public CapcutMaterialVideo CreateMaterial() => CapcutMaterialVideo.Create(this);
+            public CapcutMaterialVideoVideo CreateMaterial() => CapcutMaterialVideoVideo.Create(this);
+        }
+        public class DraftMaterialValuePhoto : DraftMaterialValue
+        {
+            public DraftMaterialValuePhoto()
+            {
+                Metetype = MeteType.photo;
+            }
+
+            [JsonIgnore]
+            public required int Width
+            {
+                get => _Width;
+                init => _Width = value;
+            }
+
+            [JsonIgnore]
+            public required int Height
+            {
+                get => _Height;
+                init => _Height = value;
+            }
+
+            public CapcutMaterialVideoPhoto CreateMaterial() => CapcutMaterialVideoPhoto.Create(this);
         }
         public class DraftMaterialValueAudio : DraftMaterialValue
         {

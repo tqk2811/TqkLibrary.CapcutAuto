@@ -53,7 +53,7 @@ namespace TqkLibrary.CapcutAuto.ConsoleTest
 
             capcutProjectHelper.DraftContent.CapcutTracks.Add(new CapcutTrackVideo()
             {
-                new CapcutSegmentVideo()
+                new CapcutSegmentVideoVideo()
                 {
                     MaterialVideo = materialVideo.CreateMaterial(),
                     TargetTimerange = new()
@@ -71,7 +71,7 @@ namespace TqkLibrary.CapcutAuto.ConsoleTest
                         .CloneWithRandomId()
                         .SetProp(x => x.Duration = TimeSpan.FromSeconds(1.5)),
                 },
-                new CapcutSegmentVideo()
+                new CapcutSegmentVideoVideo()
                 {
                     MaterialVideo = materialVideo.CreateMaterial(),
                     TargetTimerange = new()
@@ -89,7 +89,7 @@ namespace TqkLibrary.CapcutAuto.ConsoleTest
                         .CloneWithRandomId()
                         .SetProp(x => x.Duration = TimeSpan.FromSeconds(2.5)),
                 },
-                new CapcutSegmentVideo()
+                new CapcutSegmentVideoVideo()
                 {
                     MaterialVideo = materialVideo.CreateMaterial(),
                     TargetTimerange = new()
