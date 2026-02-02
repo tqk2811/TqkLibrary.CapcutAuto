@@ -89,10 +89,14 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models
             public MeteType Metetype { get; protected set; }
 
             [JsonProperty("roughcut_time_range")]
-            public required RoughcutTimeRange RoughcutTimeRange { get; init; }
+            public required TimeRange RoughcutTimeRange { get; init; }
 
             [JsonProperty("sub_time_range")]
-            public SubTimeRange SubTimeRange { get; } = new();
+            public TimeRange SubTimeRange { get; } = new()
+            {
+                Duration = TimeSpan.FromMicroseconds(-1),
+                Start = TimeSpan.FromMicroseconds(-1),
+            };
 
             [JsonProperty("type")]
             public int Type { get; } = 0;
@@ -160,21 +164,13 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models
             }
             public CapcutMaterialAudioExtractMusic CreateMaterial() => CapcutMaterialAudioExtractMusic.Create(this);
         }
-        public class RoughcutTimeRange
+        public class TimeRange
         {
             [JsonProperty("duration")]
             public required TimeSpan Duration { get; init; }
 
             [JsonProperty("start")]
             public required TimeSpan Start { get; init; }
-        }
-        public class SubTimeRange
-        {
-            [JsonProperty("duration")]
-            public int Duration { get; } = -1;
-
-            [JsonProperty("start")]
-            public int Start { get; } = -1;
         }
     }
 }
