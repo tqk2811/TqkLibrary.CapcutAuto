@@ -2,23 +2,16 @@
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using Emgu.CV.Util;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Tesseract;
 using TqkLibrary.Automation.Images;
 using TqkLibrary.CapcutAuto.Exceptions;
 using TqkLibrary.WinApi;
 using TqkLibrary.WinApi.Helpers;
 using TqkLibrary.WinApi.WmiHelpers;
-using TqkLibrary.WindowCapture;
 using TqkLibrary.WindowCapture.Captures;
 using Windows.Win32;
-using static System.Formats.Asn1.AsnWriter;
 
 namespace TqkLibrary.CapcutAuto
 {

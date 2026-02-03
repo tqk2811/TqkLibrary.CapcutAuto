@@ -3,7 +3,7 @@ using TqkLibrary.CapcutAuto.ResourceGenerate.Models.Tracks.Segments;
 
 namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Tracks
 {
-    public sealed class CapcutTrackSticker: CapcutTrack
+    public sealed class CapcutTrackSticker : CapcutTrack
     {
         public CapcutTrackSticker()
         {

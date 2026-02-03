@@ -3,7 +3,7 @@ using TqkLibrary.CapcutAuto.ResourceGenerate.Models.Materials;
 
 namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Tracks.Segments
 {
-    public sealed class CapcutSegmentVideoVideo: CapcutSegmentVideoBase
+    public sealed class CapcutSegmentVideoVideo : CapcutSegmentVideoBase
     {
         [JsonIgnore]
         public override CapcutMaterialVideoBase MaterialVideoBase => MaterialVideo;

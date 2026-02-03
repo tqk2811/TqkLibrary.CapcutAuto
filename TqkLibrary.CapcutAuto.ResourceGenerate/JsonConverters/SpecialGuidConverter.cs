@@ -1,13 +1,12 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace TqkLibrary.CapcutAuto.ResourceGenerate.JsonConverters
 {
     public class SpecialGuidConverter : JsonConverter<Guid>
     {
         public override void WriteJson(
-            JsonWriter writer, 
-            Guid value, 
+            JsonWriter writer,
+            Guid value,
             JsonSerializer serializer
             )
         {
@@ -15,10 +14,10 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.JsonConverters
         }
 
         public override Guid ReadJson(
-            JsonReader reader, 
-            Type objectType, 
-            Guid existingValue, 
-            bool hasExistingValue, 
+            JsonReader reader,
+            Type objectType,
+            Guid existingValue,
+            bool hasExistingValue,
             JsonSerializer serializer
             )
         {

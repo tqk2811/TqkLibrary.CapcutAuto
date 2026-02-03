@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System.Collections;
 using TqkLibrary.CapcutAuto.ResourceGenerate.Enums;
 using TqkLibrary.CapcutAuto.ResourceGenerate.Models.Animations;
 

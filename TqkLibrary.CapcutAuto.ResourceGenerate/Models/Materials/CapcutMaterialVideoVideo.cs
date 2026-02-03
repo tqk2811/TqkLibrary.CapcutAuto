@@ -1,5 +1,4 @@
-﻿using FFMpegCore;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using TqkLibrary.CapcutAuto.ResourceGenerate.Enums;
 
 namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Materials

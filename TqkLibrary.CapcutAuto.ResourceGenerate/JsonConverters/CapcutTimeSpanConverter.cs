@@ -20,7 +20,7 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.JsonConverters
                 return;
             }
 
-            TimeSpan ts = (TimeSpan)value;            
+            TimeSpan ts = (TimeSpan)value;
             writer.WriteValue((long)ts.TotalMicroseconds);
         }
         public override object? ReadJson(

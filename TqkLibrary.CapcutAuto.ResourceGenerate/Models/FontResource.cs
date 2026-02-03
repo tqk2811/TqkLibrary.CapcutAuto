@@ -1,13 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TqkLibrary.CapcutAuto.ResourceGenerate.Enums;
 using TqkLibrary.CapcutAuto.ResourceGenerate.JsonConverters;
-using TqkLibrary.CapcutAuto.ResourceGenerate.Models.Materials;
 
 namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models
 {
@@ -22,7 +15,7 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models
         [JsonProperty("path")]
         [JsonConverter(typeof(CapcutPathConverter))]
         public required string Path { get; set; }
-        
+
         [JsonProperty("resource_id")]
         public required string ResourceId { get; init; }
 

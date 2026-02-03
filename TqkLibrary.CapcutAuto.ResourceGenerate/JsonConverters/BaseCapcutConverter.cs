@@ -46,7 +46,7 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.JsonConverters
                     new Type[0] { },
                     null
                 )!;
-                instance = (BaseCapcut)constructor.Invoke(new object[] {  });
+                instance = (BaseCapcut)constructor.Invoke(new object[] { });
             }
             else
             {

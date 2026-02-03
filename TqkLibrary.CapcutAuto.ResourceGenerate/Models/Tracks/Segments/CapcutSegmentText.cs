@@ -33,7 +33,7 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Tracks.Segments
         {
             get
             {
-                if(MaterialEffectBloom is not null)
+                if (MaterialEffectBloom is not null)
                     yield return MaterialEffectBloom;
                 if (MaterialEffectTextEffect is not null)
                     yield return MaterialEffectTextEffect;

@@ -1,10 +1,4 @@
 ﻿using FFMpegCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TqkLibrary.CapcutAuto.ResourceGenerate.Models.Tracks;
 using TqkLibrary.CapcutAuto.ResourceGenerate.Models;
 
 namespace TqkLibrary.CapcutAuto.ResourceGenerate.Helpers

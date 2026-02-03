@@ -3,7 +3,7 @@ using TqkLibrary.CapcutAuto.ResourceGenerate.Models.Tracks.Segments;
 
 namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Tracks
 {
-    public sealed class CapcutTrackAudio: CapcutTrack
+    public sealed class CapcutTrackAudio : CapcutTrack
     {
         public CapcutTrackAudio()
         {
