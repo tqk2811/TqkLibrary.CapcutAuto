@@ -59,8 +59,8 @@ namespace TqkLibrary.CapcutAuto
         }
 
 
-        ProcessHelper? _rootProcess;
-        public async Task OpenCapcutAsync(CancellationToken cancellationToken = default)
+        protected ProcessHelper? _rootProcess;
+        public virtual async Task OpenCapcutAsync(CancellationToken cancellationToken = default)
         {
 #if DEBUG
             var processes = Process.GetProcessesByName("Capcut");
@@ -121,7 +121,7 @@ namespace TqkLibrary.CapcutAuto
             _rootProcess = child;
         }
 
-        public async Task ClickProjectWhiteCoverAsync(CancellationToken cancellationToken = default)
+        public virtual async Task ClickProjectWhiteCoverAsync(CancellationToken cancellationToken = default)
         {
             if (_rootProcess is null) throw new InvalidOperationException($"Run {nameof(OpenCapcutAsync)} first");
 
@@ -207,7 +207,7 @@ namespace TqkLibrary.CapcutAuto
             }
         }
 
-        public async Task ClickExportAsync(CancellationToken cancellationToken = default)
+        public virtual async Task ClickExportAsync(CancellationToken cancellationToken = default)
         {
             if (_rootProcess is null) throw new InvalidOperationException($"Run {nameof(OpenCapcutAsync)} first");
 
@@ -283,7 +283,7 @@ namespace TqkLibrary.CapcutAuto
         }
 
 
-        public async Task ExportRenderAsync(CancellationToken cancellationToken = default)
+        public virtual async Task ExportRenderAsync(CancellationToken cancellationToken = default)
         {
             if (_rootProcess is null) throw new InvalidOperationException($"Run {nameof(OpenCapcutAsync)} first");
 
@@ -383,7 +383,7 @@ namespace TqkLibrary.CapcutAuto
         }
 
 
-        async Task CloseAnotherPopupWindowAsync(IEnumerable<string> exceptTitles, CancellationToken cancellationToken = default)
+        protected virtual async Task CloseAnotherPopupWindowAsync(IEnumerable<string> exceptTitles, CancellationToken cancellationToken = default)
         {
             if (_rootProcess is null) return;
             using CancellationTokenSource timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
@@ -401,7 +401,7 @@ namespace TqkLibrary.CapcutAuto
 
 
 
-        static Rectangle? FindWhiteCover(Image<Gray, byte> imageGray, double areaSize = 4500)
+        protected static Rectangle? FindWhiteCover(Image<Gray, byte> imageGray, double areaSize = 4500)
         {
             using Image<Gray, byte> imgThreshold = imageGray.ThresholdBinary(new Gray(230), new Gray(255));
 
@@ -447,7 +447,7 @@ namespace TqkLibrary.CapcutAuto
             return largestSquare;
         }
 
-        static (Rectangle?, string?) FindBlueButton(Image<Hsv, byte> imageHsv, Rectangle crop, string whiteList, double areaSize)
+        protected static(Rectangle?, string?) FindBlueButton(Image<Hsv, byte> imageHsv, Rectangle crop, string whiteList, double areaSize)
         {
             using var imageHsvCrop = imageHsv.Copy(crop);
             using Image<Gray, byte> mask = imageHsvCrop.InRange(new Hsv(79, 111, 109), new Hsv(96, 255, 255));
