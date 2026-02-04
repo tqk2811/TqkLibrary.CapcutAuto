@@ -5,6 +5,15 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models
 {
     public class RootMetaInfo
     {
+        public static RootMetaInfo Parse(string json)
+        {
+            return JsonConvert.DeserializeObject<RootMetaInfo>(json)!;
+        }
+        public string GetJsonString()
+        {
+            return JsonConvert.SerializeObject(this);
+        }
+
         [JsonProperty("all_draft_store")]
         public required List<DraftStore> AllDraftStore { get; init; }
 
@@ -106,15 +115,18 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models
             public int TmDraftCloudUserId { get; set; } = -1;
 
             [JsonProperty("tm_draft_create")]
+            [JsonConverter(typeof(CapcutDateTimeMicroSecondConverter))]
             public DateTime TmDraftCreate { get; set; } = DateTime.Now;
 
             [JsonProperty("tm_draft_modified")]
+            [JsonConverter(typeof(CapcutDateTimeMicroSecondConverter))]
             public DateTime TmDraftModified { get; set; } = DateTime.Now;
 
             [JsonProperty("tm_draft_removed")]
             public long TmDraftRemoved { get; set; } = 0;
 
             [JsonProperty("tm_duration")]
+            [JsonConverter(typeof(CapcutTimeSpanConverter))]
             public TimeSpan TmDuration { get; set; } = TimeSpan.Zero;
         }
     }
