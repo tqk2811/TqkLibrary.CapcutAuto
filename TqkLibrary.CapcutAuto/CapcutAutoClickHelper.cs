@@ -334,7 +334,7 @@ namespace TqkLibrary.CapcutAuto
                 IntPtr? hmonitor = MonitorHelper.Monitors.FirstOrDefault();
                 if (!hmonitor.HasValue) throw new CapcutAutoException($"Can't get monitor handle");
 
-                setupResult = capture.InitWindow(hmonitor.Value);
+                setupResult = capture.InitMonitor(hmonitor.Value);
                 if (!setupResult) throw new CapcutAutoException($"Init capture window failed");
             }
 
