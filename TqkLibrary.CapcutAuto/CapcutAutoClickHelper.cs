@@ -27,7 +27,7 @@ namespace TqkLibrary.CapcutAuto
             "Apps\\CapCut.exe"
             ));
 
-        public static TimeSpan WaitCloseProcessTimeout { get; set; } = TimeSpan.FromSeconds(10);
+        public static TimeSpan WaitCloseProcessTimeout { get; set; } = TimeSpan.FromSeconds(5);
         public static TimeSpan DelayBeforeWindowShow { get; set; } = TimeSpan.FromSeconds(3);
         public static TimeSpan WaitWindowTimeout { get; set; } = TimeSpan.FromSeconds(20);
         public static TimeSpan CheckImageTimeout { get; set; } = TimeSpan.FromSeconds(30);
