@@ -250,7 +250,7 @@ namespace TqkLibrary.CapcutAuto
             using (CancellationTokenSource timeout = new CancellationTokenSource(CheckImageAndWaitProjectTimeout))
             {
                 var exportWindows = _rootProcess.AllWindows.Where(x =>
-                     "Export".Equals(x.Title, StringComparison.OrdinalIgnoreCase)
+                     x.Title.StartsWith("Export", StringComparison.OrdinalIgnoreCase)
                      && "Qt622QWindowIcon".Equals(x.ClassName, StringComparison.OrdinalIgnoreCase)
                      );
                 while (!exportWindows.Any())
@@ -310,7 +310,7 @@ namespace TqkLibrary.CapcutAuto
             using (CancellationTokenSource timeout = new CancellationTokenSource(WaitWindowTimeout))
             {
                 var exportWindows = _rootProcess.AllWindows.Where(x =>
-                    "Export".Equals(x.Title, StringComparison.OrdinalIgnoreCase)
+                    x.Title.StartsWith("Export", StringComparison.OrdinalIgnoreCase)
                     && "Qt622QWindowIcon".Equals(x.ClassName, StringComparison.OrdinalIgnoreCase)
                     );
                 while (exportWindowHelper is null)
