@@ -164,7 +164,7 @@ namespace TqkLibrary.CapcutAuto
                     capture.IsShowCursor = false;
                 using (CancellationTokenSource timeout = new CancellationTokenSource(SetupCaptureTimeout))
                 {
-                    while (!await capture.InitWindowAsync(windowHelper.WindowHandle))
+                    while (!capture.InitWindow(windowHelper.WindowHandle))
                     {
                         if (timeout.IsCancellationRequested)
                             throw new CapcutAutoTimeoutException($"Init capture window failed");
@@ -178,7 +178,7 @@ namespace TqkLibrary.CapcutAuto
                     while (true)
                     {
                         await Task.Delay(500, cancellationToken);
-                        using Bitmap? bitmap = await capture.CaptureImageAsync();
+                        using Bitmap? bitmap = capture.Capture();
                         Rectangle? rectangle = null;
                         if (bitmap is not null)
                         {
@@ -238,7 +238,7 @@ namespace TqkLibrary.CapcutAuto
                 capture.IsShowCursor = false;
             using (CancellationTokenSource timeout = new CancellationTokenSource(SetupCaptureTimeout))
             {
-                while (!await capture.InitWindowAsync(windowHelper.WindowHandle))
+                while (!capture.InitWindow(windowHelper.WindowHandle))
                 {
                     if (timeout.IsCancellationRequested)
                         throw new CapcutAutoTimeoutException($"Init capture window failed");
@@ -256,7 +256,7 @@ namespace TqkLibrary.CapcutAuto
                 while (!exportWindows.Any())
                 {
                     await Task.Delay(500, cancellationToken);
-                    using Bitmap? bitmap = await capture.CaptureImageAsync();
+                    using Bitmap? bitmap = capture.Capture();
                     Rectangle? rectangle = null;
                     if (bitmap is not null)
                     {
@@ -334,7 +334,7 @@ namespace TqkLibrary.CapcutAuto
                 IntPtr? hmonitor = MonitorHelper.Monitors.FirstOrDefault();
                 if (!hmonitor.HasValue) throw new CapcutAutoException($"Can't get monitor handle");
 
-                setupResult = await capture.InitMonitorAsync(hmonitor.Value);
+                setupResult = capture.InitWindow(hmonitor.Value);
                 if (!setupResult) throw new CapcutAutoException($"Init capture window failed");
             }
 
@@ -354,7 +354,7 @@ namespace TqkLibrary.CapcutAuto
                     Rectangle? windowArea = exportWindowHelper.GetArea();
                     if (!windowArea.HasValue) continue;
 
-                    using Bitmap? bitmap = await capture.CaptureImageAsync();
+                    using Bitmap? bitmap = capture.Capture();
                     if (bitmap is null) continue;
                     using Image<Hsv, byte> screenHsv = bitmap.ToImage<Hsv, byte>();
 
