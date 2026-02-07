@@ -341,11 +341,13 @@ namespace TqkLibrary.CapcutAuto
             await Task.Delay(500, cancellationToken);
 
             //render & chờ nút share
-            using (CancellationTokenSource timeout = new CancellationTokenSource(WaitRenderTimeout))
+            using (CancellationTokenSource timeoutRender = new CancellationTokenSource(WaitRenderTimeout))
             {
+                using CancellationTokenSource timeoutClickExport = new CancellationTokenSource(CheckImageTimeout);
+                bool isClickedExport = false;
                 while (true)
                 {
-                    if (timeout.IsCancellationRequested)
+                    if (timeoutRender.IsCancellationRequested)
                     {
                         throw new CapcutAutoTimeoutException($"Check render timeout");
                     }
@@ -371,12 +373,17 @@ namespace TqkLibrary.CapcutAuto
                         {
                             Point center = rectButton.Value.GetCenter();
                             await exportWindowHelper.MouseClickAsync(center);//click export
+                            isClickedExport = true;
                             continue;
                         }
                         else if ("Share".Equals(name, StringComparison.OrdinalIgnoreCase))
                         {
                             return;
                         }
+                    }
+                    if(!isClickedExport && timeoutClickExport.IsCancellationRequested)
+                    {
+                        throw new CapcutAutoTimeoutException("Waitting click 'Export' timeout");
                     }
                 }
             }
@@ -447,7 +454,7 @@ namespace TqkLibrary.CapcutAuto
             return largestSquare;
         }
 
-        protected static(Rectangle?, string?) FindBlueButton(Image<Hsv, byte> imageHsv, Rectangle crop, string whiteList, double areaSize)
+        protected static (Rectangle?, string?) FindBlueButton(Image<Hsv, byte> imageHsv, Rectangle crop, string whiteList, double areaSize)
         {
             using var imageHsvCrop = imageHsv.Copy(crop);
             using Image<Gray, byte> mask = imageHsvCrop.InRange(new Hsv(79, 111, 109), new Hsv(96, 255, 255));
