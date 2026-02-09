@@ -1,4 +1,5 @@
 ﻿using FFMpegCore;
+using System.Drawing;
 using TqkLibrary.CapcutAuto.ResourceGenerate.Models;
 
 namespace TqkLibrary.CapcutAuto.ResourceGenerate.Helpers
@@ -59,12 +60,22 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Helpers
             if (mediaAnalysis.PrimaryVideoStream is null)
                 throw new InvalidOperationException($"File had no VideoStream");
 
+            Size videoSize;
+            if (mediaAnalysis.PrimaryVideoStream.Rotation == 90 || mediaAnalysis.PrimaryVideoStream.Rotation == 270)
+            {
+                videoSize = new(mediaAnalysis.PrimaryVideoStream.Height, mediaAnalysis.PrimaryVideoStream.Width);
+            }
+            else
+            {
+                videoSize = new(mediaAnalysis.PrimaryVideoStream.Width, mediaAnalysis.PrimaryVideoStream.Height);
+            }
+
             DraftMetaInfo.DraftMaterialValueVideo value = new()
             {
                 ExtraInfo = fileInfo.Name,
                 FilePath = fileInfo.FullName,
-                Height = mediaAnalysis.PrimaryVideoStream.Height,
-                Width = mediaAnalysis.PrimaryVideoStream.Width,
+                Height = videoSize.Height,
+                Width = videoSize.Width,
                 RoughcutTimeRange = new()
                 {
                     Duration = mediaAnalysis.Duration,
