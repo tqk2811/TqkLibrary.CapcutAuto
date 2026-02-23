@@ -95,11 +95,11 @@ namespace TqkLibrary.CapcutAuto.ResourceTracker.Helpers
 
                         int count = Directory.GetFiles(TextsDir, "*.json").Length;
 
-                        string textFileName = $"{count:000}.json";
-                        string textJsonFilePath = Path.Combine(TextsDir, textFileName);
-                        Console.WriteLine($"Write text: {textFileName}");
-                        string textJson = JsonConvert.SerializeObject(text, Formatting.Indented);
-                        await File.WriteAllTextAsync(textJsonFilePath, textJson);
+                        //string textFileName = $"{count:000}.json";
+                        //string textJsonFilePath = Path.Combine(TextsDir, textFileName);
+                        //Console.WriteLine($"Write text: {textFileName}");
+                        //string textJson = JsonConvert.SerializeObject(text, Formatting.Indented);
+                        //await File.WriteAllTextAsync(textJsonFilePath, textJson);
 
                         string? bloomId = null;
                         if (_track_Helper.TextExtraMaterialRefIds.ContainsKey(id))

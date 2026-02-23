@@ -355,7 +355,6 @@ namespace TqkLibrary.CapcutAuto
                 new Tuple<Hsv, Hsv>(lowerBlue, upperBlue)
             };
 
-
             //render & chờ nút share
             using (CancellationTokenSource timeoutRender = new CancellationTokenSource(WaitRenderTimeout))
             {
@@ -406,6 +405,86 @@ namespace TqkLibrary.CapcutAuto
         }
         #endregion
 
+
+
+        #region Autocaption
+        public async Task AutocaptionAsync(CancellationToken cancellationToken = default)
+        {
+            if (_rootProcess is null) throw new InvalidOperationException($"Run {nameof(OpenCapcutAsync)} first");
+
+            var windows = _rootProcess.WindowsTree.Where(x =>
+                x.IsAltTabWindow
+                && "CapCut".Equals(x.Title, StringComparison.OrdinalIgnoreCase)
+                && "Qt622QWindowIcon".Equals(x.ClassName, StringComparison.OrdinalIgnoreCase)
+                );
+            WindowHelper? windowHelper = null;
+            using (CancellationTokenSource timeout = new CancellationTokenSource(WaitWindowTimeout))
+            {
+                while (windowHelper is null)
+                {
+                    if (timeout.IsCancellationRequested)
+                        throw new CapcutAutoTimeoutException("Waitting window timeout");
+                    await Task.Delay(100, cancellationToken);
+                    windowHelper = windows.FirstOrDefault();
+                }
+            }
+
+            await Task.Delay(DelayBeforeWindowShow, cancellationToken);
+
+            using var capture = new WinrtGraphicCapture();
+            capture.MaxFps = 6;
+            if (WinrtGraphicCapture.IsCaptureCursorToggleSupported)
+                capture.IsShowCursor = false;
+            using (CancellationTokenSource timeout = new CancellationTokenSource(SetupCaptureTimeout))
+            {
+                while (!capture.InitWindow(windowHelper.WindowHandle))
+                {
+                    if (timeout.IsCancellationRequested)
+                        throw new CapcutAutoTimeoutException($"Init capture window failed");
+                    await Task.Delay(500);
+                }
+            }
+
+            //capture & click
+            using (CancellationTokenSource timeout = new CancellationTokenSource(CheckImageAndWaitProjectTimeout))
+            {
+                var exportWindows = _rootProcess.AllWindows.Where(x =>
+                     "Export".Equals(x.Title, StringComparison.OrdinalIgnoreCase)
+                     && "Qt622QWindowIcon".Equals(x.ClassName, StringComparison.OrdinalIgnoreCase)
+                     );
+                while (!exportWindows.Any())
+                {
+                    await Task.Delay(500, cancellationToken);
+                    using Bitmap? bitmap = capture.Capture();
+                    Rectangle? rectangle = null;
+                    if (bitmap is not null)
+                    {
+                        using Image<Hsv, byte> imageHsv = bitmap.ToImage<Hsv, byte>();
+                        Rectangle crop = new Rectangle(0, 0, 450, 80);//450 x 80 top left
+
+                        //text -> autocaption -> generate
+
+
+
+
+
+
+
+
+                    }
+
+                    if (timeout.IsCancellationRequested)
+                    {
+                        if (bitmap is null)
+                            throw new CapcutAutoTimeoutException($"Can't capture image");
+                        if (!rectangle.HasValue)
+                            throw new CapcutAutoTimeoutException($"FindBlueButton not found");
+                        throw new CapcutAutoTimeoutException($"Check image timeout");
+                    }
+                }
+            }
+        }
+        #endregion
 
 
         protected virtual async Task CloseAnotherPopupWindowAsync(IEnumerable<string> exceptTitles, CancellationToken cancellationToken = default)

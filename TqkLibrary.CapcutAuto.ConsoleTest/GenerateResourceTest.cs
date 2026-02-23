@@ -10,6 +10,15 @@ namespace TqkLibrary.CapcutAuto.ConsoleTest
 {
     internal static class GenerateResourceTest
     {
+        static CapcutAnimationText? GetRandomItem(this IReadOnlyList<CapcutAnimationText> datas)
+        {
+            if (datas.Any())
+            {
+                return datas[Random.Shared.Next(datas.Count)];
+            }
+            return null;
+        }
+
         public static async Task TestAsync()
         {
             List<CapcutMaterialTransition> capcutMaterialTransitions = new List<CapcutMaterialTransition>();
@@ -133,66 +142,58 @@ namespace TqkLibrary.CapcutAuto.ConsoleTest
             var text2 = capcutMaterialText.CloneWithRandomId();
             text2.ContentHelper.Text = "Đây là văn bản sdsadsadsadsa";
             text2.ContentHelper.Styles.First().Range = new() { 0, text2.ContentHelper.Text.Length };
-            capcutProjectHelper.DraftContent.CapcutTracks.Add(new CapcutTrackText()
+
+            var firstSegmentText = new CapcutSegmentText()
             {
-                new CapcutSegmentText()
+                MaterialText = text0,
+                TargetTimerange = new()
                 {
-                    MaterialText = text0,
-                    TargetTimerange = new()
-                    {
-                        Start = TimeSpan.Zero,
-                        Duration = TimeSpan.FromSeconds(5),
-                    },
-                    Volume = 0.0,
-                    MaterialAnimation = new()
-                    {
-                        In = text_in_animations[Random.Shared.Next(text_in_animations.Count)]
-                            .Clone()
-                            .SetProp(x => x.Duration = TimeSpan.FromSeconds(2)),
-                        Out = text_out_animations[Random.Shared.Next(text_out_animations.Count)]
-                            .Clone()
-                            .SetProp(x => x.Duration = TimeSpan.FromSeconds(2)),
-                    },
+                    Start = TimeSpan.Zero,
+                    Duration = TimeSpan.FromSeconds(5),
                 },
-                new CapcutSegmentText()
+                Volume = 0.0,
+                MaterialAnimation = new()
                 {
-                    MaterialText = text1,
-                    TargetTimerange = new()
-                    {
-                        Start = TimeSpan.FromSeconds(5),
-                        Duration = TimeSpan.FromSeconds(5),
-                    },
-                    Volume = 0.0,
-                    MaterialAnimation = new()
-                    {
-                        In = text_in_animations[Random.Shared.Next(text_in_animations.Count)]
-                            .Clone()
-                            .SetProp(x => x.Duration = TimeSpan.FromSeconds(1.5)),
-                        Out = text_out_animations[Random.Shared.Next(text_out_animations.Count)]
-                            .Clone()
-                            .SetProp(x => x.Duration = TimeSpan.FromSeconds(1.5)),
-                    },
+                    In = text_in_animations.GetRandomItem()?.Clone()?.SetProp(x => x.Duration = TimeSpan.FromSeconds(2)),
+                    Out = text_out_animations.GetRandomItem()?.Clone().SetProp(x => x.Duration = TimeSpan.FromSeconds(2)),
                 },
-                new CapcutSegmentText()
+            };
+            var secondSegmentText = new CapcutSegmentText()
+            {
+                MaterialText = text0,
+                TargetTimerange = new()
                 {
-                    MaterialText = text2,
-                    TargetTimerange = new()
-                    {
-                        Start = TimeSpan.FromSeconds(10),
-                        Duration = TimeSpan.FromSeconds(5),
-                    },
-                    Volume = 0.0,
-                    MaterialAnimation = new()
-                    {
-                        In = text_in_animations[Random.Shared.Next(text_in_animations.Count)]
-                            .Clone()
-                            .SetProp(x => x.Duration = TimeSpan.FromSeconds(1)),
-                        Out = text_out_animations[Random.Shared.Next(text_out_animations.Count)]
-                            .Clone()
-                            .SetProp(x => x.Duration = TimeSpan.FromSeconds(1)),
-                    },
+                    Start = TimeSpan.FromSeconds(5),
+                    Duration = TimeSpan.FromSeconds(5),
                 },
-            });
+                Volume = 0.0,
+                MaterialAnimation = new()
+                {
+                    In = text_in_animations.GetRandomItem()?.Clone()?.SetProp(x => x.Duration = TimeSpan.FromSeconds(1.5)),
+                    Out = text_out_animations.GetRandomItem()?.Clone()?.SetProp(x => x.Duration = TimeSpan.FromSeconds(1.5)),
+                },
+            };
+            var thirdSegmentText = new CapcutSegmentText()
+            {
+                MaterialText = text0,
+                TargetTimerange = new()
+                {
+                    Start = TimeSpan.FromSeconds(10),
+                    Duration = TimeSpan.FromSeconds(5),
+                },
+                Volume = 0.0,
+                MaterialAnimation = new()
+                {
+                    In = text_in_animations.GetRandomItem()?.Clone()?.SetProp(x => x.Duration = TimeSpan.FromSeconds(1)),
+                    Out = text_out_animations.GetRandomItem()?.Clone()?.SetProp(x => x.Duration = TimeSpan.FromSeconds(1)),
+                },
+            };
+
+            CapcutTrackText capcutTrackText = new CapcutTrackText();
+            capcutTrackText.Add(firstSegmentText);
+            capcutTrackText.Add(secondSegmentText);
+            capcutTrackText.Add(thirdSegmentText);
+            capcutProjectHelper.DraftContent.CapcutTracks.Add(capcutTrackText);
 
             await capcutProjectHelper.CleanupProjectAsync();
 

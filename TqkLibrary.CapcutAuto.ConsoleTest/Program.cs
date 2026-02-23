@@ -5,19 +5,7 @@ using System.Drawing;
 using TqkLibrary.CapcutAuto;
 using TqkLibrary.CapcutAuto.ConsoleTest;
 
-//await CapcutAutoClickHelper.CloseWindowAsync();
+await CapcutAutoClickHelper.CloseWindowAsync();
 //await GenerateResourceTest.TestAsync();
-
-CapcutAutoClickHelper capcutAutoClickHelper = new CapcutAutoClickHelper();
-try
-{
-    await capcutAutoClickHelper.OpenCapcutAsync();
-    await capcutAutoClickHelper.ClickProjectWhiteCoverAsync();
-    await capcutAutoClickHelper.ClickExportAsync();
-    await capcutAutoClickHelper.ExportRenderAsync();
-}
-finally
-{
-    await CapcutAutoClickHelper.CloseWindowAsync();
-}
-
+await AutoClickRenderTest.TestAsync();
+//await AutoClickAutocaptionTest.TestAsync();
