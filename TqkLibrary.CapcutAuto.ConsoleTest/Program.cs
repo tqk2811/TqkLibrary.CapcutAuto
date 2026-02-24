@@ -7,5 +7,5 @@ using TqkLibrary.CapcutAuto.ConsoleTest;
 
 await CapcutAutoClickHelper.CloseWindowAsync();
 //await GenerateResourceTest.TestAsync();
-await AutoClickRenderTest.TestAsync();
-//await AutoClickAutocaptionTest.TestAsync();
+//await AutoClickRenderTest.TestAsync();
+await AutoClickAutocaptionTest.TestAsync();

@@ -47,7 +47,7 @@ namespace TqkLibrary.CapcutAuto
 
 
         public static Rectangle? FindWhiteCover(
-            this Image<Gray, byte> imageGray, 
+            this Image<Gray, byte> imageGray,
             double areaSize = 4500
             )
         {
@@ -94,16 +94,19 @@ namespace TqkLibrary.CapcutAuto
             }
             return largestSquare;
         }
-        public static(Rectangle?, string?) FindFilledButtonWithText(
-            this Image<Hsv, byte> imageHsv, 
-            IEnumerable<Tuple<Hsv, Hsv>> minMaxs, 
-            Rectangle crop,
-            string whiteList, 
-            double areaSize
+
+        public static (Rectangle?, string?) FindFilledButtonWithText(
+            this Image<Bgra, byte> imageBGRA,
+            IEnumerable<Tuple<Hsv, Hsv>> minMaxs,
+            Rectangle? crop,
+            string whiteList,
+            double areaSize,
+            bool isOcrGray = true
             )
         {
-            using var imageHsvCrop = imageHsv.Copy(crop);
-            using Image<Gray, byte> mask = imageHsvCrop.GetMasks(minMaxs);
+            using var imageBGRACrop = imageBGRA.Copy(crop ?? imageBGRA.ROI);
+            using var imageHSVCrop = imageBGRACrop.Convert<Hsv, byte>();
+            using Image<Gray, byte> mask = imageHSVCrop.GetMasks(minMaxs);
             //mask.Save("C:\\BlueButtonMark.png");
             using Image<Gray, byte> maskBlur = new(mask.Size);
             CvInvoke.MedianBlur(mask, maskBlur, 5);
@@ -118,23 +121,100 @@ namespace TqkLibrary.CapcutAuto
                 {
                     Rectangle rectangle = CvInvoke.BoundingRectangle(contours[i]);
 
-                    using var grayCropButton = mask.Copy(rectangle);
-                    using var grayCropButtonScale = grayCropButton.Resize(2.0, Inter.Cubic);
+                    Pix img;
+                    if (isOcrGray)
+                    {
+                        using var grayCropButton = mask.Copy(rectangle);
+                        using var grayCropButtonScale = grayCropButton.Resize(2.0, Inter.Cubic);
 #if DEBUG
-                    grayCropButtonScale.Save("C:\\BlueButtonMark.png");
+                        grayCropButtonScale.Save("C:\\BlueButtonMark.png");
 #endif
-
+                        using Bitmap preTess = grayCropButtonScale.ToBitmap();
+                        img = PixConverter.ToPix(preTess);
+                    }
+                    else
+                    {
+                        using var bgraCropButton = imageBGRACrop.Copy(rectangle);
+                        using var bgraCropButtonScale = bgraCropButton.Resize(2.0, Inter.Cubic);
+#if DEBUG
+                        bgraCropButtonScale.Save("C:\\BlueButtonMark.png");
+#endif
+                        using Bitmap preTess = bgraCropButtonScale.ToBitmap();
+                        img = PixConverter.ToPix(preTess);
+                    }
                     using var tessEngine = new TesseractEngine(Path.Combine(AppContext.BaseDirectory, "TessDatas"), "eng", EngineMode.Default);
                     tessEngine.SetVariable("tessedit_char_whitelist", new string(whiteList.Distinct().ToArray()));
-
-                    using Bitmap preTess = grayCropButtonScale.ToBitmap();
-                    using var img = PixConverter.ToPix(preTess);
-                    using var page = tessEngine.Process(img, PageSegMode.SingleLine);
-                    string text = page.GetText();
-                    text = text.Trim().Replace(" ", string.Empty);
-                    return (new Rectangle(crop.X + rectangle.X, crop.Y + rectangle.Y, rectangle.Width, rectangle.Height), text);
+                    try
+                    {
+                        using var page = tessEngine.Process(img, PageSegMode.SingleLine);
+                        string text = page.GetText();
+                        text = text.Trim().Replace(" ", string.Empty);
+                        return (new Rectangle((crop?.X ?? 0) + rectangle.X, (crop?.Y ?? 0) + rectangle.Y, rectangle.Width, rectangle.Height), text);
+                    }
+                    finally
+                    {
+                        img.Dispose();
+                    }
                 }
             }
+
+            return (null, null);
+        }
+
+        public static (Rectangle?, string?) FindTextButton(
+            this Image<Bgra, byte> imageBGRA,
+            IEnumerable<Tuple<Hsv, Hsv>> minMaxs,
+            Rectangle crop,
+            string whiteList,
+            string textToFind,
+            PageIteratorLevel pageIteratorLevel,
+            bool isOcrGray = true
+            )
+        {
+            double zoomLevel = 2.0;
+            using var imageBGRACrop = imageBGRA.Copy(crop);
+            using var imageHSVCrop = imageBGRACrop.Convert<Hsv, byte>();
+            using Image<Gray, byte> mask = imageHSVCrop.GetMasks(minMaxs);
+
+            using var imageBGRACropWithMask = new Image<Bgra, byte>(imageBGRACrop.Size);
+            CvInvoke.BitwiseAnd(imageBGRACrop, imageBGRACrop, imageBGRACropWithMask, mask);
+
+            using var zoomedMask = imageBGRACropWithMask.Resize(zoomLevel, Inter.Cubic);
+            //CvInvoke.Threshold(zoomedMask, zoomedMask, 128, 255, ThresholdType.Binary);
+
+            using var bitmap = zoomedMask.ToBitmap();
+#if DEBUG
+            bitmap.Save("C:\\FindTextButton.png", System.Drawing.Imaging.ImageFormat.Png);
+#endif
+            using var pix = PixConverter.ToPix(bitmap);
+
+            using var tessEngine = new TesseractEngine(Path.Combine(AppContext.BaseDirectory, "TessDatas"), "eng", EngineMode.Default);
+            if (!string.IsNullOrWhiteSpace(whiteList))
+                tessEngine.SetVariable("tessedit_char_whitelist", new string(whiteList.Distinct().ToArray()));
+            using var page = tessEngine.Process(pix);
+            using var iter = page.GetIterator();
+            iter.Begin();
+            do
+            {
+                string currentText = iter.GetText(pageIteratorLevel).Trim();
+
+                if (!string.IsNullOrEmpty(currentText) &&
+                    currentText.Contains(textToFind, StringComparison.OrdinalIgnoreCase))
+                {
+                    if (iter.TryGetBoundingBox(pageIteratorLevel, out Rect bounds))
+                    {
+                        // 4. Chuyển đổi tọa độ từ vùng Crop về tọa độ ảnh gốc
+                        Rectangle globalRect = new Rectangle(
+                            crop.X + (int)(bounds.X1 / zoomLevel),
+                            crop.Y + (int)(bounds.Y1 / zoomLevel),
+                            (int)(bounds.Width / zoomLevel),
+                            (int)(bounds.Height / zoomLevel)
+                        );
+
+                        return (globalRect, currentText);
+                    }
+                }
+            } while (iter.Next(pageIteratorLevel));
 
             return (null, null);
         }

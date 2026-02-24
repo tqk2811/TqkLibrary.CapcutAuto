@@ -270,10 +270,10 @@ namespace TqkLibrary.CapcutAuto
                     Rectangle? rectangle = null;
                     if (bitmap is not null)
                     {
-                        using Image<Hsv, byte> imageHsv = bitmap.ToImage<Hsv, byte>();
-                        Rectangle crop = new Rectangle(imageHsv.Width - 450, 0, 450, 80);//450 x 80 top right
+                        using Image<Bgra, byte> imageBGRA = bitmap.ToImage<Bgra, byte>();
+                        Rectangle crop = new Rectangle(imageBGRA.Width - 450, 0, 450, 80);//450 x 80 top right
 
-                        (rectangle, string? name) = imageHsv.FindFilledButtonWithText(tuples, crop, "Export", 900);
+                        (rectangle, string? name) = imageBGRA.FindFilledButtonWithText(tuples, crop, "Export", 900);
                         if (rectangle.HasValue && "Export".Equals(name, StringComparison.OrdinalIgnoreCase))
                         {
                             await windowHelper.WindowHandle.ControlLClickAsync(rectangle.Value.GetCenter());
@@ -373,7 +373,7 @@ namespace TqkLibrary.CapcutAuto
 
                     using Bitmap? bitmap = capture.Capture();
                     if (bitmap is null) continue;
-                    using Image<Hsv, byte> screenHsv = bitmap.ToImage<Hsv, byte>();
+                    using Image<Bgra, byte> screenBGRA = bitmap.ToImage<Bgra, byte>();
 
                     Rectangle bottomWindow = new Rectangle(//bottom right
                         windowArea.Value.X + windowArea.Value.Width - 400,
@@ -381,7 +381,7 @@ namespace TqkLibrary.CapcutAuto
                         400,
                         66
                         );
-                    (Rectangle? rectButton, string? name) = screenHsv.FindFilledButtonWithText(tuples, bottomWindow, "ExportShare", 1000);//miss click
+                    (Rectangle? rectButton, string? name) = screenBGRA.FindFilledButtonWithText(tuples, bottomWindow, "ExportShare", 1000);//miss click
                     if (rectButton.HasValue)
                     {
                         if ("Export".Equals(name, StringComparison.OrdinalIgnoreCase))
@@ -396,7 +396,7 @@ namespace TqkLibrary.CapcutAuto
                             return;
                         }
                     }
-                    if(!isClickedExport && timeoutClickExport.IsCancellationRequested)
+                    if (!isClickedExport && timeoutClickExport.IsCancellationRequested)
                     {
                         throw new CapcutAutoTimeoutException("Waitting click 'Export' timeout");
                     }
@@ -445,43 +445,126 @@ namespace TqkLibrary.CapcutAuto
                 }
             }
 
-            //capture & click
+            Hsv lowerBlue = new Hsv(79, 190, 0);
+            Hsv upperBlue = new Hsv(100, 255, 255);
+            List<Tuple<Hsv, Hsv>> cyanColor = new List<Tuple<Hsv, Hsv>>()
+            {
+                new Tuple<Hsv, Hsv>(lowerBlue, upperBlue)
+            };
+
+            bool isClickedText = false;
+            bool isClickedAutocaption = false;
             using (CancellationTokenSource timeout = new CancellationTokenSource(CheckImageAndWaitProjectTimeout))
             {
-                var exportWindows = _rootProcess.AllWindows.Where(x =>
-                     "Export".Equals(x.Title, StringComparison.OrdinalIgnoreCase)
-                     && "Qt622QWindowIcon".Equals(x.ClassName, StringComparison.OrdinalIgnoreCase)
-                     );
-                while (!exportWindows.Any())
+                while (true)
                 {
                     await Task.Delay(500, cancellationToken);
                     using Bitmap? bitmap = capture.Capture();
                     Rectangle? rectangle = null;
                     if (bitmap is not null)
                     {
-                        using Image<Hsv, byte> imageHsv = bitmap.ToImage<Hsv, byte>();
-                        Rectangle crop = new Rectangle(0, 0, 450, 80);//450 x 80 top left
+                        using Image<Bgra, byte> imageBgra = bitmap.ToImage<Bgra, byte>();
 
                         //text -> autocaption -> generate
+                        if (!isClickedText)
+                        {
+                            Rectangle cropText = new Rectangle(0, 0, 200, 78);
 
+                            List<Tuple<Hsv, Hsv>> whiteColor = new List<Tuple<Hsv, Hsv>>()
+                            {
+                                new Tuple<Hsv, Hsv>(new Hsv(0, 0, 150), new Hsv(180, 150, 255))
+                            };
 
+                            (Rectangle? rect, string? text) = imageBgra.FindTextButton(
+                                whiteColor,
+                                cropText,
+                                "Text",
+                                "Text",
+                                PageIteratorLevel.Word
+                                );
+                            if (rect.HasValue)
+                            {
+                                Point center = rect.Value.GetCenter();
+                                await windowHelper.MouseClickAsync(center);
+                                continue;
+                            }
 
+                            (rect, text) = imageBgra.FindTextButton(
+                                cyanColor,
+                                cropText,
+                                "Text",
+                                "Text",
+                                PageIteratorLevel.Word
+                                );
+                            if (rect.HasValue)
+                            {
+                                isClickedText = true;
+                            }
+                        }
 
+                        if (isClickedText && !isClickedAutocaption)
+                        {
+                            Rectangle cropAutoCaption = new Rectangle(0, 0, 128, 300);
+                            List<Tuple<Hsv, Hsv>> whiteColor = new List<Tuple<Hsv, Hsv>>()
+                            {
+                                new Tuple<Hsv, Hsv>(new Hsv(0, 0, 166), new Hsv(180, 170, 255))
+                            };
+                            (Rectangle? rect, string? text) = imageBgra.FindTextButton(
+                                whiteColor,
+                                cropAutoCaption,
+                                "Auto captions",
+                                "Auto captions",
+                                PageIteratorLevel.TextLine
+                                );
+                            if (rect.HasValue)
+                            {
+                                Point center = rect.Value.GetCenter();
+                                await windowHelper.MouseClickAsync(center);
+                                continue;
+                            }
 
+                            (rect, text) = imageBgra.FindTextButton(
+                                cyanColor,
+                                cropAutoCaption,
+                                "Auto captions",
+                                "Auto captions",
+                                PageIteratorLevel.TextLine
+                                );
+                            if (rect.HasValue)
+                            {
+                                isClickedAutocaption = true;
+                            }
+                        }
 
-
-
+                        if (isClickedAutocaption)
+                        {
+                            int x = 350;
+                            int y = 300;
+                            Rectangle crop = new Rectangle(x, y, imageBgra.Width / 2 - x, (int)(imageBgra.Height * 2.0 / 3) - y);
+                            (rectangle, string? name) = imageBgra.FindFilledButtonWithText(cyanColor, crop, "Generate", 1200, false);
+                            if (rectangle.HasValue)
+                            {
+                                Point center = rectangle.Value.GetCenter();
+                                await windowHelper.MouseClickAsync(center);
+                                break;
+                            }
+                        }
                     }
 
                     if (timeout.IsCancellationRequested)
                     {
                         if (bitmap is null)
                             throw new CapcutAutoTimeoutException($"Can't capture image");
-                        if (!rectangle.HasValue)
-                            throw new CapcutAutoTimeoutException($"FindBlueButton not found");
+                        if (!isClickedText)
+                            throw new CapcutAutoTimeoutException($"{nameof(isClickedText)} failed");
+                        if (!isClickedAutocaption)
+                            throw new CapcutAutoTimeoutException($"{nameof(isClickedAutocaption)} failed");
                         throw new CapcutAutoTimeoutException($"Check image timeout");
                     }
                 }
+
+                //wait popup closed ??
+
             }
         }
         #endregion
