@@ -29,8 +29,8 @@ namespace TqkLibrary.CapcutAuto
         }
 
         public static Image<Gray, byte> GetMarks(this Image<Hsv, byte> imageHsv, params Tuple<Hsv, Hsv>[] minMaxs)
-            => GetMarks(imageHsv, minMaxs.AsEnumerable());
-        public static Image<Gray, byte> GetMarks(this Image<Hsv, byte> imageHsv, IEnumerable<Tuple<Hsv, Hsv>> minMaxs)
+            => GetMasks(imageHsv, minMaxs.AsEnumerable());
+        public static Image<Gray, byte> GetMasks(this Image<Hsv, byte> imageHsv, IEnumerable<Tuple<Hsv, Hsv>> minMaxs)
         {
             if (imageHsv == null) throw new ArgumentNullException(nameof(imageHsv));
             if (minMaxs == null || !minMaxs.Any()) throw new ArgumentNullException(nameof(minMaxs));
@@ -103,7 +103,7 @@ namespace TqkLibrary.CapcutAuto
             )
         {
             using var imageHsvCrop = imageHsv.Copy(crop);
-            using Image<Gray, byte> mask = imageHsvCrop.GetMarks(minMaxs);
+            using Image<Gray, byte> mask = imageHsvCrop.GetMasks(minMaxs);
             //mask.Save("C:\\BlueButtonMark.png");
             using Image<Gray, byte> maskBlur = new(mask.Size);
             CvInvoke.MedianBlur(mask, maskBlur, 5);
