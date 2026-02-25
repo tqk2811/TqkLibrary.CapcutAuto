@@ -439,7 +439,7 @@ namespace TqkLibrary.CapcutAuto
                                 new Tuple<Hsv, Hsv>(new Hsv(0, 0, 150), new Hsv(180, 150, 255))
                             };
 
-                            (Rectangle? rect, string? text) = imageBgra.FindTextButton(
+                            Rectangle? rect = imageBgra.FindTextButton(
                                 whiteColor,
                                 cropText,
                                 "Text",
@@ -453,7 +453,7 @@ namespace TqkLibrary.CapcutAuto
                                 continue;
                             }
 
-                            (rect, text) = imageBgra.FindTextButton(
+                            rect = imageBgra.FindTextButton(
                                 cyanColor,
                                 cropText,
                                 "Text",
@@ -473,7 +473,7 @@ namespace TqkLibrary.CapcutAuto
                             {
                                 new Tuple<Hsv, Hsv>(new Hsv(0, 0, 166), new Hsv(180, 170, 255))
                             };
-                            (Rectangle? rect, string? text) = imageBgra.FindTextButton(
+                            Rectangle? rect = imageBgra.FindTextButton(
                                 whiteColor,
                                 cropAutoCaption,
                                 "Auto captions",
@@ -487,7 +487,7 @@ namespace TqkLibrary.CapcutAuto
                                 continue;
                             }
 
-                            (rect, text) = imageBgra.FindTextButton(
+                            rect = imageBgra.FindTextButton(
                                 cyanColor,
                                 cropAutoCaption,
                                 "Auto captions",

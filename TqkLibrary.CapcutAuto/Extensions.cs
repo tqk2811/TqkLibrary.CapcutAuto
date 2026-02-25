@@ -161,7 +161,7 @@ namespace TqkLibrary.CapcutAuto
             return (null, null);
         }
 
-        public static (Rectangle?, string?) FindTextButton(
+        public static Rectangle? FindTextButton(
             this Image<Bgra, byte> imageBGRA,
             IEnumerable<Tuple<Hsv, Hsv>> minMaxs,
             Rectangle crop,
@@ -211,12 +211,12 @@ namespace TqkLibrary.CapcutAuto
                             (int)(bounds.Height / zoomLevel)
                         );
 
-                        return (globalRect, currentText);
+                        return globalRect;
                     }
                 }
             } while (iter.Next(pageIteratorLevel));
 
-            return (null, null);
+            return null;
         }
     }
 }
