@@ -59,7 +59,7 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Materials
         }
         public void SetFontSize(int size)
         {
-            if (size < 8) throw new InvalidOperationException("Font size should larger than 8");
+            if (size < 1) throw new InvalidOperationException("Font size should larger than 1");
             this.ContentHelper.Styles.First().Size = size;
         }
         public void SetFont(FontResource fontResource)
