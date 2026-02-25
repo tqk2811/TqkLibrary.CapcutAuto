@@ -6,6 +6,7 @@ using TqkLibrary.CapcutAuto;
 using TqkLibrary.CapcutAuto.ConsoleTest;
 
 await CapcutAutoClickHelper.CloseWindowAsync();
-//await GenerateResourceTest.TestAsync();
-//await AutoClickRenderTest.TestAsync();
+await AutoClickRenderTest.TestAsync();
+
+await CapcutAutoClickHelper.CloseWindowAsync();
 await AutoClickAutocaptionTest.TestAsync();
