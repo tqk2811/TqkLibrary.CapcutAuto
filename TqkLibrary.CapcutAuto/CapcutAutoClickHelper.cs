@@ -417,7 +417,7 @@ namespace TqkLibrary.CapcutAuto
 
             bool isClickedText = false;
             bool isClickedAutocaption = false;
-            using (CancellationTokenSource timeout = new CancellationTokenSource(CheckImageAndWaitProjectTimeout))
+            using (CancellationTokenSource timeout = new CancellationTokenSource(WaitRenderTimeout))
             {
                 string windowTitles0 = string.Empty;
                 while (true)
