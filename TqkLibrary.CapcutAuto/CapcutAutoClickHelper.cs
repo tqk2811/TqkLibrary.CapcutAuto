@@ -187,6 +187,7 @@ namespace TqkLibrary.CapcutAuto
                             if (rectangle.HasValue)
                             {
                                 await windowHelper.WindowHandle.ControlLClickAsync(rectangle.Value.GetCenter());
+                                await Task.Delay(DelayBeforeWindowShow, cancellationToken);
                                 return;
                             }
                         }
@@ -219,6 +220,7 @@ namespace TqkLibrary.CapcutAuto
                 && "CapCut".Equals(x.Title, StringComparison.OrdinalIgnoreCase)
                 && "Qt622QWindowIcon".Equals(x.ClassName, StringComparison.OrdinalIgnoreCase)
                 );
+
             WindowHelper? windowHelper = null;
             using (CancellationTokenSource timeout = new CancellationTokenSource(WaitWindowTimeout))
             {
@@ -230,8 +232,6 @@ namespace TqkLibrary.CapcutAuto
                     windowHelper = windows.FirstOrDefault();
                 }
             }
-
-            await Task.Delay(DelayBeforeWindowShow, cancellationToken);
 
             var exportWindows = _rootProcess.AllWindows.Where(x =>
                  x.Title.StartsWith("Export", StringComparison.OrdinalIgnoreCase)
@@ -380,6 +380,7 @@ namespace TqkLibrary.CapcutAuto
                 && "CapCut".Equals(x.Title, StringComparison.OrdinalIgnoreCase)
                 && "Qt622QWindowIcon".Equals(x.ClassName, StringComparison.OrdinalIgnoreCase)
                 );
+
             WindowHelper? windowHelper = null;
             using (CancellationTokenSource timeout = new CancellationTokenSource(WaitWindowTimeout))
             {
@@ -391,8 +392,6 @@ namespace TqkLibrary.CapcutAuto
                     windowHelper = windows.FirstOrDefault();
                 }
             }
-
-            await Task.Delay(DelayBeforeWindowShow, cancellationToken);
 
             using var capture = new WinrtGraphicCapture();
             capture.MaxFps = 6;
