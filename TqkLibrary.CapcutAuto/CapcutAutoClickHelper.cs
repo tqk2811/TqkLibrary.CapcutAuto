@@ -449,7 +449,7 @@ namespace TqkLibrary.CapcutAuto
                             if (rect.HasValue)
                             {
                                 Point center = rect.Value.GetCenter();
-                                await windowHelper.MouseClickAsync(center);
+                                await windowHelper.WindowHandle.ControlLClickAsync(center);
                                 continue;
                             }
 
@@ -483,7 +483,7 @@ namespace TqkLibrary.CapcutAuto
                             if (rect.HasValue)
                             {
                                 Point center = rect.Value.GetCenter();
-                                await windowHelper.MouseClickAsync(center);
+                                await windowHelper.WindowHandle.ControlLClickAsync(center);
                                 continue;
                             }
 
@@ -510,7 +510,7 @@ namespace TqkLibrary.CapcutAuto
                             {
                                 Point center = rectangle.Value.GetCenter();
                                 windowTitles0 = string.Join("\r\n", _rootProcess.AllWindows);
-                                await windowHelper.MouseClickAsync(center);
+                                await windowHelper.WindowHandle.ControlLClickAsync(center);
                                 break;
                             }
                         }
