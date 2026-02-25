@@ -273,7 +273,13 @@ namespace TqkLibrary.CapcutAuto
                             using Image<Bgra, byte> imageBGRA = bitmap.ToImage<Bgra, byte>();
                             Rectangle crop = new Rectangle(imageBGRA.Width - 450, 0, 450, 80);//450 x 80 top right
 
-                            (rectangle, string? name) = imageBGRA.FindFilledButtonWithText(tuples, crop, "Export", 900);
+                            (rectangle, string? name) = imageBGRA.FindFilledButtonWithText(
+                                tuples,
+                                crop,
+                                "Export",
+                                new string[] { "Export" },
+                                900
+                                );
                             if (rectangle.HasValue && "Export".Equals(name, StringComparison.OrdinalIgnoreCase))
                             {
                                 await windowHelper.WindowHandle.ControlLClickAsync(rectangle.Value.GetCenter());
@@ -343,7 +349,13 @@ namespace TqkLibrary.CapcutAuto
                             400,
                             66
                             );
-                        (Rectangle? rectButton, string? name) = screenBGRA.FindFilledButtonWithText(cyanBlue, bottomWindow, "ExportShare", 1000);//miss click
+                        (Rectangle? rectButton, string? name) = screenBGRA.FindFilledButtonWithText(
+                            cyanBlue,
+                            bottomWindow,
+                            "ExportShare",
+                            new string[] { "Export", "Share" },
+                            1000
+                            );//miss click
                         if (rectButton.HasValue)
                         {
                             if ("Export".Equals(name, StringComparison.OrdinalIgnoreCase))
@@ -501,10 +513,17 @@ namespace TqkLibrary.CapcutAuto
 
                         if (isClickedAutocaption)
                         {
-                            int x = 350;
-                            int y = 300;
-                            Rectangle crop = new Rectangle(x, y, imageBgra.Width / 2 - x, (int)(imageBgra.Height * 2.0 / 3) - y);
-                            (rectangle, string? name) = imageBgra.FindFilledButtonWithText(cyanColor, crop, "Generate", 1200, false);
+                            //int x = 350;
+                            //int y = 300;
+                            //Rectangle crop = new Rectangle(x, y, imageBgra.Width / 2 - x, (int)(imageBgra.Height * 2.0 / 3) - y);
+                            (rectangle, string? name) = imageBgra.FindFilledButtonWithText(
+                                cyanColor,
+                                null,
+                                "Generate",
+                                new string[] { "Generate" },
+                                1200,
+                                false
+                                );
                             if (rectangle.HasValue)
                             {
                                 Point center = rectangle.Value.GetCenter();

@@ -100,6 +100,7 @@ namespace TqkLibrary.CapcutAuto
             IEnumerable<Tuple<Hsv, Hsv>> minMaxs,
             Rectangle? crop,
             string whiteList,
+            IEnumerable<string> textToFinds,
             double areaSize,
             bool isOcrGray = true
             )
@@ -110,6 +111,9 @@ namespace TqkLibrary.CapcutAuto
             //mask.Save("C:\\BlueButtonMark.png");
             using Image<Gray, byte> maskBlur = new(mask.Size);
             CvInvoke.MedianBlur(mask, maskBlur, 5);
+
+            using var tessEngine = new TesseractEngine(Path.Combine(AppContext.BaseDirectory, "TessDatas"), "eng", EngineMode.Default);
+            tessEngine.SetVariable("tessedit_char_whitelist", new string(whiteList.Distinct().ToArray()));
 
             using VectorOfVectorOfPoint contours = new VectorOfVectorOfPoint();
             using Mat hierarchy = new Mat();
@@ -142,14 +146,15 @@ namespace TqkLibrary.CapcutAuto
                         using Bitmap preTess = bgraCropButtonScale.ToBitmap();
                         img = PixConverter.ToPix(preTess);
                     }
-                    using var tessEngine = new TesseractEngine(Path.Combine(AppContext.BaseDirectory, "TessDatas"), "eng", EngineMode.Default);
-                    tessEngine.SetVariable("tessedit_char_whitelist", new string(whiteList.Distinct().ToArray()));
+                    using var page = tessEngine.Process(img, PageSegMode.SingleLine);
                     try
                     {
-                        using var page = tessEngine.Process(img, PageSegMode.SingleLine);
                         string text = page.GetText();
                         text = text.Trim().Replace(" ", string.Empty);
-                        return (new Rectangle((crop?.X ?? 0) + rectangle.X, (crop?.Y ?? 0) + rectangle.Y, rectangle.Width, rectangle.Height), text);
+                        if (textToFinds.Any(x => x.Equals(text, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            return (new Rectangle((crop?.X ?? 0) + rectangle.X, (crop?.Y ?? 0) + rectangle.Y, rectangle.Width, rectangle.Height), text);
+                        }
                     }
                     finally
                     {
