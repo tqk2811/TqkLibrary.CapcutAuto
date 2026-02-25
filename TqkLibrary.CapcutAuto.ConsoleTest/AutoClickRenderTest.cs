@@ -11,7 +11,6 @@
                 await capcutAutoClickHelper.OpenCapcutAsync();
                 await capcutAutoClickHelper.ClickProjectWhiteCoverAsync();
                 await capcutAutoClickHelper.ClickExportAsync();
-                await capcutAutoClickHelper.ExportRenderAsync();
             }
             finally
             {

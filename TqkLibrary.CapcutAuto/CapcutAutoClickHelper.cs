@@ -233,172 +233,135 @@ namespace TqkLibrary.CapcutAuto
 
             await Task.Delay(DelayBeforeWindowShow, cancellationToken);
 
+            var exportWindows = _rootProcess.AllWindows.Where(x =>
+                 x.Title.StartsWith("Export", StringComparison.OrdinalIgnoreCase)
+                 && "Qt622QWindowIcon".Equals(x.ClassName, StringComparison.OrdinalIgnoreCase)
+                 );
 
-
-            using var capture = new WinrtGraphicCapture();
-            capture.MaxFps = 6;
-            if (WinrtGraphicCapture.IsCaptureCursorToggleSupported)
-                capture.IsShowCursor = false;
-            using (CancellationTokenSource timeout = new CancellationTokenSource(SetupCaptureTimeout))
+            using (var capture = new WinrtGraphicCapture())
             {
-                while (!capture.InitWindow(windowHelper.WindowHandle))
+                capture.MaxFps = 6;
+                if (WinrtGraphicCapture.IsCaptureCursorToggleSupported)
+                    capture.IsShowCursor = false;
+                using (CancellationTokenSource timeout = new CancellationTokenSource(SetupCaptureTimeout))
                 {
-                    if (timeout.IsCancellationRequested)
-                        throw new CapcutAutoTimeoutException($"Init capture window failed");
-                    await Task.Delay(500);
+                    while (!capture.InitWindow(windowHelper.WindowHandle))
+                    {
+                        if (timeout.IsCancellationRequested)
+                            throw new CapcutAutoTimeoutException($"Init capture window failed");
+                        await Task.Delay(500);
+                    }
+                }
+
+                //capture & click
+                using (CancellationTokenSource timeout = new CancellationTokenSource(CheckImageAndWaitProjectTimeout))
+                {
+                    Hsv lowerBlue = new Hsv(79, 111, 109);
+                    Hsv upperBlue = new Hsv(96, 255, 255);
+                    List<Tuple<Hsv, Hsv>> tuples = new List<Tuple<Hsv, Hsv>>()
+                    {
+                        new Tuple<Hsv, Hsv>(lowerBlue, upperBlue)
+                    };
+
+                    while (!exportWindows.Any())
+                    {
+                        await Task.Delay(500, cancellationToken);
+                        using Bitmap? bitmap = capture.Capture();
+                        Rectangle? rectangle = null;
+                        if (bitmap is not null)
+                        {
+                            using Image<Bgra, byte> imageBGRA = bitmap.ToImage<Bgra, byte>();
+                            Rectangle crop = new Rectangle(imageBGRA.Width - 450, 0, 450, 80);//450 x 80 top right
+
+                            (rectangle, string? name) = imageBGRA.FindFilledButtonWithText(tuples, crop, "Export", 900);
+                            if (rectangle.HasValue && "Export".Equals(name, StringComparison.OrdinalIgnoreCase))
+                            {
+                                await windowHelper.WindowHandle.ControlLClickAsync(rectangle.Value.GetCenter());
+                            }
+                        }
+
+                        if (timeout.IsCancellationRequested)
+                        {
+                            if (bitmap is null)
+                                throw new CapcutAutoTimeoutException($"Can't capture image");
+                            if (!rectangle.HasValue)
+                                throw new CapcutAutoTimeoutException($"FindBlueButton not found");
+                            throw new CapcutAutoTimeoutException($"Check image timeout");
+                        }
+                    }
                 }
             }
 
-            //capture & click
-            using (CancellationTokenSource timeout = new CancellationTokenSource(CheckImageAndWaitProjectTimeout))
+            using (var capture = new WinrtGraphicCapture())
             {
-                var exportWindows = _rootProcess.AllWindows.Where(x =>
-                     x.Title.StartsWith("Export", StringComparison.OrdinalIgnoreCase)
-                     && "Qt622QWindowIcon".Equals(x.ClassName, StringComparison.OrdinalIgnoreCase)
-                     );
-                Hsv lowerBlue = new Hsv(79, 111, 109);
-                Hsv upperBlue = new Hsv(96, 255, 255);
-                List<Tuple<Hsv, Hsv>> tuples = new List<Tuple<Hsv, Hsv>>()
+                capture.MaxFps = 6;
+                if (WinrtGraphicCapture.IsCaptureCursorToggleSupported)
+                    capture.IsShowCursor = false;
+                bool setupResult = false;
                 {
-                    new Tuple<Hsv, Hsv>(lowerBlue, upperBlue)
+                    IntPtr? hmonitor = MonitorHelper.Monitors.FirstOrDefault();
+                    if (!hmonitor.HasValue) throw new CapcutAutoException($"Can't get monitor handle");
+
+                    setupResult = capture.InitMonitor(hmonitor.Value);
+                    if (!setupResult) throw new CapcutAutoException($"Init capture monitor failed");
+                }
+                await Task.Delay(500, cancellationToken);
+
+                List<Tuple<Hsv, Hsv>> cyanBlue = new List<Tuple<Hsv, Hsv>>()
+                {
+                    new Tuple<Hsv, Hsv>(new Hsv(79, 111, 109), new Hsv(96, 255, 255))
                 };
 
-                while (!exportWindows.Any())
-                {
-                    await Task.Delay(500, cancellationToken);
-                    using Bitmap? bitmap = capture.Capture();
-                    Rectangle? rectangle = null;
-                    if (bitmap is not null)
-                    {
-                        using Image<Bgra, byte> imageBGRA = bitmap.ToImage<Bgra, byte>();
-                        Rectangle crop = new Rectangle(imageBGRA.Width - 450, 0, 450, 80);//450 x 80 top right
 
-                        (rectangle, string? name) = imageBGRA.FindFilledButtonWithText(tuples, crop, "Export", 900);
-                        if (rectangle.HasValue && "Export".Equals(name, StringComparison.OrdinalIgnoreCase))
+                //render & chờ nút share
+                using (CancellationTokenSource timeoutRender = new CancellationTokenSource(WaitRenderTimeout))
+                {
+                    using CancellationTokenSource timeoutClickExport = new CancellationTokenSource(CheckImageTimeout);
+                    bool isClickedExport = false;
+                    while (true)
+                    {
+
+                        if (timeoutRender.IsCancellationRequested)
                         {
-                            await windowHelper.WindowHandle.ControlLClickAsync(rectangle.Value.GetCenter());
+                            throw new CapcutAutoTimeoutException($"Check render timeout");
                         }
-                    }
-
-                    if (timeout.IsCancellationRequested)
-                    {
-                        if (bitmap is null)
-                            throw new CapcutAutoTimeoutException($"Can't capture image");
-                        if (!rectangle.HasValue)
-                            throw new CapcutAutoTimeoutException($"FindBlueButton not found");
-                        throw new CapcutAutoTimeoutException($"Check image timeout");
-                    }
-                }
-            }
-        }
-        public virtual async Task ExportRenderAsync(CancellationToken cancellationToken = default)
-        {
-            if (_rootProcess is null) throw new InvalidOperationException($"Run {nameof(OpenCapcutAsync)} first");
-
-            WindowHelper? capcutWindowHelper = null;
-            using (CancellationTokenSource timeout = new CancellationTokenSource(WaitWindowTimeout))
-            {
-                var capcutWindows = _rootProcess.WindowsTree.Where(x =>
-                    x.IsAltTabWindow
-                    && "CapCut".Equals(x.Title, StringComparison.OrdinalIgnoreCase)
-                    && "Qt622QWindowIcon".Equals(x.ClassName, StringComparison.OrdinalIgnoreCase)
-                    );
-                while (capcutWindowHelper is null)
-                {
-                    if (timeout.IsCancellationRequested)
-                    {
-                        throw new CapcutAutoTimeoutException("Waitting window timeout");
-                    }
-                    await Task.Delay(100, cancellationToken);
-                    capcutWindowHelper = capcutWindows.FirstOrDefault();
-                }
-            }
-
-            WindowHelper? exportWindowHelper = null;
-            using (CancellationTokenSource timeout = new CancellationTokenSource(WaitWindowTimeout))
-            {
-                var exportWindows = _rootProcess.AllWindows.Where(x =>
-                    x.Title.StartsWith("Export", StringComparison.OrdinalIgnoreCase)
-                    && "Qt622QWindowIcon".Equals(x.ClassName, StringComparison.OrdinalIgnoreCase)
-                    );
-                while (exportWindowHelper is null)
-                {
-                    if (timeout.IsCancellationRequested)
-                    {
-                        throw new CapcutAutoTimeoutException("Waitting window timeout");
-                    }
-                    await Task.Delay(100, cancellationToken);
-                    exportWindowHelper = exportWindows.FirstOrDefault();
-                }
-            }
-
-
-            using var capture = new WinrtGraphicCapture();//new HdcCapture();
-            capture.MaxFps = 6;
-            if (WinrtGraphicCapture.IsCaptureCursorToggleSupported)
-                capture.IsShowCursor = false;
-            bool setupResult = false;
-            {
-                IntPtr? hmonitor = MonitorHelper.Monitors.FirstOrDefault();
-                if (!hmonitor.HasValue) throw new CapcutAutoException($"Can't get monitor handle");
-
-                setupResult = capture.InitMonitor(hmonitor.Value);
-                if (!setupResult) throw new CapcutAutoException($"Init capture window failed");
-            }
-
-            await Task.Delay(500, cancellationToken);
-
-            Hsv lowerBlue = new Hsv(79, 111, 109);
-            Hsv upperBlue = new Hsv(96, 255, 255);
-            List<Tuple<Hsv, Hsv>> tuples = new List<Tuple<Hsv, Hsv>>()
-            {
-                new Tuple<Hsv, Hsv>(lowerBlue, upperBlue)
-            };
-
-            //render & chờ nút share
-            using (CancellationTokenSource timeoutRender = new CancellationTokenSource(WaitRenderTimeout))
-            {
-                using CancellationTokenSource timeoutClickExport = new CancellationTokenSource(CheckImageTimeout);
-                bool isClickedExport = false;
-                while (true)
-                {
-                    if (timeoutRender.IsCancellationRequested)
-                    {
-                        throw new CapcutAutoTimeoutException($"Check render timeout");
-                    }
-                    await Task.Delay(1000, cancellationToken);
-
-                    Rectangle? windowArea = exportWindowHelper.GetArea();
-                    if (!windowArea.HasValue) continue;
-
-                    using Bitmap? bitmap = capture.Capture();
-                    if (bitmap is null) continue;
-                    using Image<Bgra, byte> screenBGRA = bitmap.ToImage<Bgra, byte>();
-
-                    Rectangle bottomWindow = new Rectangle(//bottom right
-                        windowArea.Value.X + windowArea.Value.Width - 400,
-                        windowArea.Value.Y + windowArea.Value.Height - 66,
-                        400,
-                        66
-                        );
-                    (Rectangle? rectButton, string? name) = screenBGRA.FindFilledButtonWithText(tuples, bottomWindow, "ExportShare", 1000);//miss click
-                    if (rectButton.HasValue)
-                    {
-                        if ("Export".Equals(name, StringComparison.OrdinalIgnoreCase))
-                        {
-                            Point center = rectButton.Value.GetCenter();
-                            await exportWindowHelper.MouseClickAsync(center);//click export
-                            isClickedExport = true;
+                        await Task.Delay(1000, cancellationToken);
+                        WindowHelper? exportWindowHelper = exportWindows.FirstOrDefault();
+                        if (exportWindowHelper is null)
                             continue;
-                        }
-                        else if ("Share".Equals(name, StringComparison.OrdinalIgnoreCase))
+
+                        Rectangle? windowArea = exportWindowHelper.GetArea();
+                        if (!windowArea.HasValue) continue;
+
+                        using Bitmap? bitmap = capture.Capture();
+                        if (bitmap is null) continue;
+                        using Image<Bgra, byte> screenBGRA = bitmap.ToImage<Bgra, byte>();
+
+                        Rectangle bottomWindow = new Rectangle(//bottom right
+                            windowArea.Value.X + windowArea.Value.Width - 400,
+                            windowArea.Value.Y + windowArea.Value.Height - 66,
+                            400,
+                            66
+                            );
+                        (Rectangle? rectButton, string? name) = screenBGRA.FindFilledButtonWithText(cyanBlue, bottomWindow, "ExportShare", 1000);//miss click
+                        if (rectButton.HasValue)
                         {
-                            return;
+                            if ("Export".Equals(name, StringComparison.OrdinalIgnoreCase))
+                            {
+                                Point center = rectButton.Value.GetCenter();
+                                await exportWindowHelper.MouseClickAsync(center);//click export
+                                isClickedExport = true;
+                                continue;
+                            }
+                            else if ("Share".Equals(name, StringComparison.OrdinalIgnoreCase))
+                            {
+                                return;
+                            }
                         }
-                    }
-                    if (!isClickedExport && timeoutClickExport.IsCancellationRequested)
-                    {
-                        throw new CapcutAutoTimeoutException("Waitting click 'Export' timeout");
+                        if (!isClickedExport && timeoutClickExport.IsCancellationRequested)
+                        {
+                            throw new CapcutAutoTimeoutException("Waitting click 'Export' timeout");
+                        }
                     }
                 }
             }
