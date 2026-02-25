@@ -419,6 +419,7 @@ namespace TqkLibrary.CapcutAuto
             bool isClickedAutocaption = false;
             using (CancellationTokenSource timeout = new CancellationTokenSource(CheckImageAndWaitProjectTimeout))
             {
+                string windowTitles0 = string.Empty;
                 while (true)
                 {
                     await Task.Delay(500, cancellationToken);
@@ -508,6 +509,7 @@ namespace TqkLibrary.CapcutAuto
                             if (rectangle.HasValue)
                             {
                                 Point center = rectangle.Value.GetCenter();
+                                windowTitles0 = string.Join("\r\n", _rootProcess.AllWindows);
                                 await windowHelper.MouseClickAsync(center);
                                 break;
                             }
@@ -527,7 +529,38 @@ namespace TqkLibrary.CapcutAuto
                 }
 
                 //wait popup closed ??
+                string windowTitles1 = string.Empty;
+                while (true)
+                {
+                    string windowTitles = string.Join("\r\n", _rootProcess.AllWindows);
+                    if (!windowTitles0.Equals(windowTitles))
+                    {
+                        //popup showed
+                        windowTitles1 = windowTitles;
+                        break;
+                    }
+                    if (timeout.IsCancellationRequested)
+                    {
+                        throw new CapcutAutoTimeoutException($"Wait auto captions popup open timeout");
+                    }
+                    await Task.Delay(10, cancellationToken);
+                }
 
+                while (true)
+                {
+                    string windowTitles = string.Join("\r\n", _rootProcess.AllWindows);
+                    if (!windowTitles1.Equals(windowTitles))
+                    {
+                        //popup closed
+                        windowTitles1 = windowTitles;
+                        break;
+                    }
+                    if (timeout.IsCancellationRequested)
+                    {
+                        throw new CapcutAutoTimeoutException($"Wait auto captions popup close timeout");
+                    }
+                    await Task.Delay(10, cancellationToken);
+                }
             }
         }
         #endregion
