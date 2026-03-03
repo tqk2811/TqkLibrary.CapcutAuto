@@ -561,7 +561,7 @@ namespace TqkLibrary.CapcutAuto
                     {
                         throw new CapcutAutoTimeoutException($"Wait auto captions popup open timeout");
                     }
-                    await Task.Delay(10, cancellationToken);
+                    await Task.Delay(1, cancellationToken);
                 }
 
                 while (true)
@@ -577,7 +577,7 @@ namespace TqkLibrary.CapcutAuto
                     {
                         throw new CapcutAutoTimeoutException($"Wait auto captions popup close timeout");
                     }
-                    await Task.Delay(10, cancellationToken);
+                    await Task.Delay(1, cancellationToken);
                 }
             }
         }
