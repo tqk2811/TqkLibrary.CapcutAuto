@@ -199,6 +199,8 @@ namespace TqkLibrary.CapcutAuto
                                 throw new CapcutAutoTimeoutException($"WhiteCover not found");
                             throw new CapcutAutoTimeoutException($"Check image timeout");
                         }
+                        if (!_rootProcess.IsAlive)
+                            throw new CapcutAutoTimeoutException($"Process exited");
                     }
                 }
             }
@@ -294,6 +296,8 @@ namespace TqkLibrary.CapcutAuto
                                 throw new CapcutAutoTimeoutException($"FindBlueButton not found");
                             throw new CapcutAutoTimeoutException($"Check image timeout");
                         }
+                        if (!_rootProcess.IsAlive)
+                            throw new CapcutAutoTimeoutException($"Process exited");
                     }
                 }
             }
@@ -326,12 +330,15 @@ namespace TqkLibrary.CapcutAuto
                     bool isClickedExport = false;
                     while (true)
                     {
-
                         if (timeoutRender.IsCancellationRequested)
                         {
                             throw new CapcutAutoTimeoutException($"Check render timeout");
                         }
                         await Task.Delay(1000, cancellationToken);
+
+                        if (!_rootProcess.IsAlive)
+                            throw new CapcutAutoTimeoutException($"Process exited");
+
                         WindowHelper? exportWindowHelper = exportWindows.FirstOrDefault();
                         if (exportWindowHelper is null)
                             continue;
@@ -544,6 +551,8 @@ namespace TqkLibrary.CapcutAuto
                             throw new CapcutAutoTimeoutException($"{nameof(isClickedAutocaption)} failed");
                         throw new CapcutAutoTimeoutException($"Check image timeout");
                     }
+                    if(!_rootProcess.IsAlive)
+                        throw new CapcutAutoTimeoutException($"Process exited");
                 }
 
                 //wait popup closed ??
@@ -561,6 +570,8 @@ namespace TqkLibrary.CapcutAuto
                     {
                         throw new CapcutAutoTimeoutException($"Wait auto captions popup open timeout");
                     }
+                    if (!_rootProcess.IsAlive)
+                        throw new CapcutAutoTimeoutException($"Process exited");
                     await Task.Delay(1, cancellationToken);
                 }
 
@@ -577,6 +588,8 @@ namespace TqkLibrary.CapcutAuto
                     {
                         throw new CapcutAutoTimeoutException($"Wait auto captions popup close timeout");
                     }
+                    if (!_rootProcess.IsAlive)
+                        throw new CapcutAutoTimeoutException($"Process exited");
                     await Task.Delay(1, cancellationToken);
                 }
             }
