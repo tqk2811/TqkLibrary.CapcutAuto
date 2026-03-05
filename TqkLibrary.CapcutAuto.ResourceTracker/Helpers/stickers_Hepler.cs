@@ -55,6 +55,12 @@ namespace TqkLibrary.CapcutAuto.ResourceTracker.Helpers
                                 {
                                     FileInfo fileInfo_png = new FileInfo(pngFilePaths[0]);
                                     string png_json_path = Path.Combine(fileInfo_png.Directory!.FullName, $"{Path.GetFileNameWithoutExtension(pngFilePaths[0])}.json");
+                                    if (!File.Exists(png_json_path))
+                                    {
+                                        var files = Directory.GetFiles(fileInfo_png.Directory.FullName, "*.json", SearchOption.TopDirectoryOnly);
+                                        if (files.Length == 1)
+                                            png_json_path = files[0];
+                                    }
                                     if (File.Exists(png_json_path))
                                     {
                                         string json_png_text = await File.ReadAllTextAsync(png_json_path);
