@@ -8,6 +8,12 @@ using TqkLibrary.Linq;
 
 Console.OutputEncoding = Encoding.UTF8;
 
+{
+    //stickers_Hepler stickers_Hepler = new();
+    //await stickers_Hepler.ReRunExtraInfoJsonAsync();
+}
+
+
 #if DEBUG && !REMOTEDEBUG
 await RunAsync(Path.Combine(AppContext.BaseDirectory, "draft_content.json"));
 #endif
