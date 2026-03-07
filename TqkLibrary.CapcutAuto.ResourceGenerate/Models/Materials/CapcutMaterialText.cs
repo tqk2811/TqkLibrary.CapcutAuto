@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Drawing;
 using TqkLibrary.CapcutAuto.ResourceGenerate.Enums;
 using TqkLibrary.CapcutAuto.ResourceGenerate.JsonConverters;
 
@@ -36,6 +37,66 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Materials
             set => _Alignment = (int)value;
         }
 
+        [JsonProperty("global_alpha")]
+        public double GlobalAlpha { get; set; } = 1.0;
+
+        [JsonProperty("background_alpha")]
+        public double BackgroundAlpha { get; set; } = 1.0;
+
+        [JsonProperty("background_color")]
+        string _background_color;//rrggbb
+        [JsonIgnore]
+        public Color BackgroundColor
+        {
+            get { return ColorTranslator.FromHtml(_background_color); }
+            set { _background_color = ColorTranslator.ToHtml(value); }
+        }
+
+        [JsonProperty("text_color")]
+        string _text_color;//rrggbb
+        [JsonIgnore]
+        public Color TextColor
+        {
+            get { return ColorTranslator.FromHtml(_text_color); }
+            set
+            {
+                _text_color = ColorTranslator.ToHtml(value);
+                if (ContentHelper.Styles?.FirstOrDefault()?.Fill?.Content?.Solid is not null)
+                {
+                    ContentHelper.Styles.First().Fill.Content.Solid!.Color = new()
+                    {
+                        value.R/255.0,
+                        value.G/255.0,
+                        value.B/255.0,
+                    };
+                }
+            }
+        }
+
+        [JsonProperty("border_color")]
+        string _border_color;
+        [JsonIgnore]
+        public Color BorderColor
+        {
+            get { return ColorTranslator.FromHtml(_border_color); }
+            set { _border_color = ColorTranslator.ToHtml(value); }
+        }
+
+        [JsonProperty("background_style")]
+        int _background_style = 0;
+        [JsonIgnore]
+        public bool IsEnableBackground
+        {
+            get => _background_style != 0;
+            set => _background_style = value ? 1 : 0;
+        }
+        [JsonProperty("background_height")]
+        public double BackgroundHeight { get; set; }
+        [JsonProperty("background_width")]
+        public double BackgroundWidth { get; set; }
+
+        [JsonProperty("use_effect_default_color")]
+        public bool UseEffectDefaultColor { get; set; }
 
         [JsonProperty("content")]
         private string _Content
