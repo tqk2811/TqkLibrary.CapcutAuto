@@ -6,7 +6,7 @@ using TqkLibrary.CapcutAuto.ResourceGenerate.JsonConverters;
 
 namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Materials
 {
-    public class CapcutMaterialText : CapcutMaterial
+    public partial class CapcutMaterialText : CapcutMaterial
     {
         [JsonConstructor]
         private CapcutMaterialText(JObject jObject) : base(jObject)
@@ -24,12 +24,12 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Materials
         public string FontResourceId { get; set; } = string.Empty;
 
 
-        [JsonProperty("add_type")]
-        public int AddType { get; set; } = 0;
+        //[JsonProperty("add_type")]
+        //public int AddType { get; set; } = 0;
+
 
         [JsonProperty("alignment")]
         int _Alignment { get; set; } = 1;
-
         [JsonIgnore]
         public MaterialTextAlignment Alignment
         {
@@ -37,8 +37,41 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Materials
             set => _Alignment = (int)value;
         }
 
+
+        [JsonProperty("check_flag")]
+        int _check_flag { get; set; }
+        [JsonIgnore]
+        public TextCheckFlag CheckFlag
+        {
+            get { return (TextCheckFlag)_check_flag; }
+            set
+            {
+                if (value.HasFlag(TextCheckFlag.Curve) && value.HasFlag(TextCheckFlag.Background))
+                    throw new InvalidOperationException($"Can't enable {nameof(TextCheckFlag.Curve)} and {TextCheckFlag.Background} sametime");
+
+                _check_flag = (int)value;
+
+                TextCurve.Enable = value.HasFlag(TextCheckFlag.Curve);
+                HasShadow = value.HasFlag(TextCheckFlag.Shadow);
+                ContentHelper.UpdateFrom(this);
+            }
+        }
+
+        #region Blend
+
+        /// <summary>
+        /// <see cref="TextCheckFlag.Blend"/>
+        /// </summary>
         [JsonProperty("global_alpha")]
         public double GlobalAlpha { get; set; } = 1.0;
+
+        #endregion
+
+
+        #region Background
+
+        [JsonProperty("background_style")]
+        public int BackgroundStyle { get; set; }//1
 
         [JsonProperty("background_alpha")]
         public double BackgroundAlpha { get; set; } = 1.0;
@@ -52,6 +85,70 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Materials
             set { _background_color = ColorTranslator.ToHtml(value); }
         }
 
+        [JsonProperty("background_height")]
+        public double BackgroundHeight { get; set; }//14% = 0.14
+
+        [JsonProperty("background_width")]
+        public double BackgroundWidth { get; set; }//14% = 0.14
+
+        [JsonProperty("background_round_radius")]
+        public double BackgroundRoundRadius { get; set; }//0-100% ex: 0.01
+
+        #endregion
+
+
+        #region Curve 
+
+        [JsonProperty("text_curve")]
+        public TextCurve TextCurve { get; set; } = new TextCurve();
+
+        #endregion
+
+        #region Shadow
+        /*
+"has_shadow": false,
+"shadow_alpha": 0.8999999761581421,
+"shadow_angle": -45.0,
+"shadow_color": "#000000",
+"shadow_distance": 5.0,
+"shadow_point": {
+    "x": 0.6363961030678928,
+    "y": -0.6363961030678928
+},
+"shadow_smoothing": 0.45000001788139343,
+         */
+        bool _HasShadow = false;
+        [JsonProperty("has_shadow")]
+        public bool HasShadow
+        {
+            get { return _HasShadow; }
+            set
+            {
+                _HasShadow = value;
+                //ContentHelper.Styles.First().sh
+            }
+        }
+
+        [JsonProperty("shadow_alpha")]
+        public double shadow_alpha { get; set; }
+
+        [JsonProperty("shadow_angle")]
+        public double shadow_angle { get; set; }
+
+        [JsonProperty("shadow_color")]
+        string _shadow_color;//html
+        [JsonIgnore]
+        public Color ShadowColor
+        {
+            get { return ColorTranslator.FromHtml(_shadow_color); }
+            set { _shadow_color = ColorTranslator.ToHtml(value); }
+        }
+
+        [JsonProperty("shadow_distance")]
+        public double ShadowDistance { get; set; }
+        #endregion
+
+
         [JsonProperty("text_color")]
         string _text_color;//rrggbb
         [JsonIgnore]
@@ -61,15 +158,7 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Materials
             set
             {
                 _text_color = ColorTranslator.ToHtml(value);
-                if (ContentHelper.Styles?.FirstOrDefault()?.Fill?.Content?.Solid is not null)
-                {
-                    ContentHelper.Styles.First().Fill.Content.Solid!.Color = new()
-                    {
-                        value.R/255.0,
-                        value.G/255.0,
-                        value.B/255.0,
-                    };
-                }
+                ContentHelper.UpdateFrom(this);
             }
         }
 
@@ -79,21 +168,12 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Materials
         public Color BorderColor
         {
             get { return ColorTranslator.FromHtml(_border_color); }
-            set { _border_color = ColorTranslator.ToHtml(value); }
+            set
+            {
+                _border_color = ColorTranslator.ToHtml(value);
+                ContentHelper.UpdateFrom(this);
+            }
         }
-
-        [JsonProperty("background_style")]
-        int _background_style = 0;
-        [JsonIgnore]
-        public bool IsEnableBackground
-        {
-            get => _background_style != 0;
-            set => _background_style = value ? 1 : 0;
-        }
-        [JsonProperty("background_height")]
-        public double BackgroundHeight { get; set; }
-        [JsonProperty("background_width")]
-        public double BackgroundWidth { get; set; }
 
         [JsonProperty("use_effect_default_color")]
         public bool UseEffectDefaultColor { get; set; }
@@ -150,89 +230,6 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Materials
         {
             string json = Extensions.GetEmbeddedResourceString("Materials.text.json");
             return Parse(json);
-        }
-
-        public class _ContentHelper
-        {
-            [JsonProperty("text")]
-            public string Text { get; set; } = string.Empty;
-
-            [JsonProperty("styles")]
-            public List<_Style> Styles { get; set; } = new();
-
-            public class _Style
-            {
-                [JsonProperty("fill")]
-                public required _Fill Fill { get; set; }
-
-                [JsonProperty("font")]
-                public required _Font Font { get; set; }
-
-                [JsonProperty("size")]
-                public required double Size { get; set; }
-
-                [JsonProperty("effectStyle")]
-                public _EffectStyle? EffectStyle { get; set; }
-
-                [JsonProperty("strokes")]
-                public List<_Fill>? Strokes { get; set; }
-
-                [JsonProperty("range")]
-                public required List<int> Range { get; set; }
-            }
-            public class _Font
-            {
-                [JsonProperty("path")]
-                [JsonConverter(typeof(CapcutPathConverter))]
-                public required string Path { get; set; }
-
-                [JsonProperty("id")]
-                public required string Id { get; set; }
-            }
-            public class _EffectStyle
-            {
-                [JsonProperty("path")]
-                [JsonConverter(typeof(CapcutPathConverter))]
-                public required string Path { get; set; }
-
-                [JsonProperty("id")]
-                public required string Id { get; set; }
-            }
-            public class _Fill
-            {
-                [JsonProperty("alpha")]
-                public double? Alpha { get; set; }
-
-                [JsonProperty("content")]
-                public required _Content Content { get; set; }
-            }
-            public class _Content
-            {
-                [JsonProperty("texture")]
-                public required _Texture Texture { get; set; }
-
-                [JsonProperty("render_type")]
-                public required string RenderType { get; set; }
-
-                [JsonProperty("solid")]
-                public _Solid? Solid { get; set; }
-            }
-            public class _Texture
-            {
-                [JsonProperty("range")]
-                public required int Range { get; set; }
-
-                [JsonProperty("path")]
-                public required string Path { get; set; }
-            }
-            public class _Solid
-            {
-                [JsonProperty("alpha")]
-                public double? Alpha { get; set; }
-
-                [JsonProperty("color")]
-                public required List<double> Color { get; set; }
-            }
         }
     }
 }
