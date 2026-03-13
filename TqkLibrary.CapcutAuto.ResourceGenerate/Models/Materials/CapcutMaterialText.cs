@@ -51,6 +51,7 @@ namespace TqkLibrary.CapcutAuto.ResourceGenerate.Models.Materials
 
                 _check_flag = (int)value;
 
+                if (TextCurve is null) TextCurve = new();
                 TextCurve.Enable = value.HasFlag(TextCheckFlag.Curve);
                 HasShadow = value.HasFlag(TextCheckFlag.Shadow);
                 ContentHelper.UpdateFrom(this);
