@@ -1,0 +1,6 @@
+<Project>
+	<PropertyGroup>
+		<!-- Áp cho MỌI project của repo này, kể cả project không import ProjectBuildProperties.targets. -->
+		<PathMap>$(MSBuildProjectDirectory)=$(MSBuildProjectName)</PathMap>
+	</PropertyGroup>
+</Project>
